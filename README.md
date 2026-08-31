@@ -1,272 +1,267 @@
 # 🎵 YouTube Music Desktop
 
-Uma aplicação Electron elegante e modular para **YouTube Music** com recursos avançados para desktop, construída com arquitetura escalável e multi-processo.
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square)](https://github.com/AllvesMatteus/youtube-music-desktop/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-blue.svg?style=flat-square)](https://www.microsoft.com/windows)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D16.x-green.svg?style=flat-square)](https://nodejs.org)
+[![Electron](https://img.shields.io/badge/electron-%3E%3D40.8.0-blue.svg?style=flat-square)](https://www.electronjs.org)
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+> 🚀 Uma aplicação Electron elegante, modular e escalável para **YouTube Music** no desktop com recursos avançados e arquitetura otimizada para performance.
 
 ---
 
-## ✨ Recursos
+## ✨ Características Principais
 
-- 🎵 **Player YouTube Music Nativo** - Interface completa do YouTube Music no desktop
-- 🔐 **Multi-Contas** - Gerencie múltiplas contas YouTube com perfis separados
-- 🛡️ **Bloqueio de Anúncios** - Bloqueador de anúncios integrado usando Ghostery/EasyList
-- ⌨️ **Atalhos Globais** - Controle reprodução com teclas de mídia global
-- 🖼️ **System Tray** - Minimize para bandeja do sistema
-- 🎨 **Persistência de Estado** - Lembra tamanho, posição e sessão da janela
-- 🤖 **Anti-Detecção** - Mascaramento inteligente de automação
-- 📡 **IPC Bidirecional** - Comunicação eficiente entre processos
-- ⚡ **Otimizado** - Arquitetura modular e escalável
+| Recurso | Descrição |
+|---------|-----------|
+| 🎵 **Player Nativo** | Interface completa do YouTube Music integrada no desktop |
+| 🔐 **Multi-Contas** | Gerencie múltiplas contas YouTube com perfis isolados |
+| 🛡️ **Bloqueio de Anúncios** | Bloqueador integrado usando Ghostery/EasyList |
+| ⌨️ **Atalhos Globais** | Controle reprodução com teclas de mídia do Windows |
+| 🖼️ **Minimizar para Tray** | Acesso rápido na bandeja do sistema |
+| 💾 **Persistência** | Lembra tamanho, posição e sessão da janela |
+| 🤖 **Anti-Detecção** | Mascaramento inteligente de automação |
+| ⚡ **Otimizado** | Arquitetura modular, escalável e performática |
 
 ---
 
 ## 📋 Pré-requisitos
 
-- **Node.js** >= 16.x
-- **npm** >= 8.x
-- **Windows 10 ou superior** (x64)
+- **Node.js** `>= 16.x` ([Download](https://nodejs.org))
+- **npm** `>= 8.x` (incluso com Node.js)
+- **Windows 10/11** (x64)
 - **Git** (opcional, para desenvolvimento)
 
 ---
 
-## 🚀 Instalação
+## 🚀 Guia de Instalação
 
-### 1. Clonar o repositório
+### Para Usuários Finais
+
+1. **Baixe o instalador** na página [Releases](https://github.com/AllvesMatteus/youtube-music-desktop/releases)
+2. **Execute** `YouTube Music Setup 1.0.0.exe`
+3. **Siga** as instruções do instalador
+4. **Inicie** a aplicação no menu iniciar ou desktop
+
+### Para Desenvolvedores
+
+#### 1. Clonar Repositório
 ```bash
-git clone https://github.com/AllvesMatteus/youtube-music.git
-cd youtube-music
+git clone https://github.com/AllvesMatteus/youtube-music-desktop.git
+cd youtube-music-desktop
 ```
 
-### 2. Instalar dependências
+#### 2. Instalar Dependências
 ```bash
 npm install
 ```
 
-### 3. Executar em modo desenvolvimento
+#### 3. Executar em Desenvolvimento
 ```bash
 npm run dev
 ```
 
-Ou iniciar normalmente:
-```bash
-npm start
-```
-
----
-
-## 🏗️ Build & Empacotamento
-
-Para criar um instalador Windows (.exe):
-
+#### 4. Build para Produção
 ```bash
 npm run build
 ```
 
-O instalador será gerado em: `dist/YouTube Music Setup 1.0.0.exe`
-
-### Recursos do Instalador
-
-- ✅ Instalação customizável em diretório específico
-- ✅ Atalhos na área de trabalho e menu iniciar
-- ✅ Desinstalação completa
+O instalador será gerado em `dist/YouTube Music Setup 1.0.0.exe`
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
 ```
-youtube-music/
-├── package.json                    # Configuração e dependências
-├── README.md                       # Este arquivo
-├── PROJETO.md                      # Documentação técnica detalhada
-│
+.
 ├── src/
-│   ├── main/                       # 🖥️ Main Process (Backend)
-│   │   ├── index.js                # Entrypoint e ciclo de vida
-│   │   ├── config/
-│   │   │   └── appConfig.js        # Constantes e configurações
-│   │   ├── windows/
-│   │   │   ├── mainWindow.js       # Gerenciador janela principal
-│   │   │   └── splashWindow.js     # Tela de splash
-│   │   ├── services/               # Camada de serviços
-│   │   │   ├── authService.js      # Autenticação in-app
-│   │   │   ├── accountService.js   # Gerenciamento de contas
-│   │   │   ├── adblockService.js   # Bloqueador de anúncios
-│   │   │   ├── mediaKeysService.js # Atalhos de mídia globais
-│   │   │   ├── trayService.js      # System tray
-│   │   │   └── windowStateService.js # Persistência de estado
-│   │   └── ipc/                    # IPC Communication
-│   │       ├── trackIpc.js         # Comunicação de tracks
-│   │       └── accountIpc.js       # Comunicação de contas
-│   │
-│   ├── preload/                    # 🔌 Preload Scripts
-│   │   ├── index.js                # Bootstrap preload
-│   │   └── modules/
-│   │       ├── antiDetection.js    # Anti-detecção de bot
-│   │       ├── playerController.js # Controle de player
-│   │       ├── trackObserver.js    # Observer de tracks
-│   │       ├── topBar.js           # Barra superior UI
-│   │       └── adSkipper.js        # Auto-skip de anúncios
-│   │
-│   ├── renderer/                   # 🎨 Renderer Process (Frontend)
-│   │   ├── splash/
-│   │   │   ├── splash.html
-│   │   │   └── splash.css
-│   │   └── ...
-│   │
-│   └── shared/                     # 📦 Código compartilhado
-│
-└── assets/                         # 🖼️ Recursos
-    └── icons/                      # Ícones da aplicação
+│   ├── main/                      # Main Process (Backend)
+│   │   ├── index.js               # Entrypoint & ciclo de vida
+│   │   ├── config/                # Configurações centralizadas
+│   │   ├── windows/               # Gerenciadores de janelas
+│   │   ├── services/              # Serviços de domínio
+│   │   │   ├── authService.js     # Autenticação
+│   │   │   ├── accountService.js  # Multi-contas
+│   │   │   ├── adblockService.js  # Bloqueio de anúncios
+│   │   │   ├── mediaKeysService.js# Atalhos globais
+│   │   │   ├── trayService.js     # Bandeja do sistema
+│   │   │   └── windowStateService.js # Persistência
+│   │   └── ipc/                   # Comunicação IPC
+│   ├── preload/                   # Preload Scripts (Bridge segura)
+│   │   └── modules/               # Módulos de injeção
+│   │       ├── antiDetection.js   # Mascaramento de automação
+│   │       ├── adSkipper.js       # Auto-skip de anúncios
+│   │       ├── playerController.js# Controle do player
+│   │       ├── trackObserver.js   # Observação de tracks
+│   │       └── topBar.js          # Barra superior
+│   ├── renderer/                  # Renderer Process
+│   │   └── splash/                # Splash screen
+│   └── shared/                    # Código compartilhado
+├── assets/                        # Recursos estáticos
+│   ├── icons/                     # Ícones da aplicação
+│   └── folder.ico                 # Ícone de pasta para instalador
+├── scripts/                       # Scripts utilitários
+├── package.json                   # Metadados & dependências
+└── PROJETO.md                     # Documentação de arquitetura
+
 ```
 
 ---
 
-## 🏛️ Arquitetura
+## 🏗️ Arquitetura
 
 A aplicação segue uma **arquitetura modular multi-processo**:
 
-### Main Process
-- Gerencia ciclo de vida da aplicação
-- Executado em Node.js nativo
-- Acesso ao sistema de arquivos e APIs do SO
-- Executa serviços isolados (autenticação, adblock, atalhos, etc)
-
-### Preload Process
-- Ponte segura entre Main e Renderer
-- Injeta APIs customizadas no contexto do window
-- Implementa módulos de automação (player controller, track observer, ad skipper)
-
-### Renderer Process
-- Interface web (YouTube Music)
-- Isolado do Node.js (segurança)
-- Comunica via IPC com Main Process
-
----
-
-## 🔧 Configuração
-
-As configurações principais estão em [src/main/config/appConfig.js](src/main/config/appConfig.js):
-
-```javascript
-// Exemplo de configuração
-const CONFIG = {
-  appName: 'YouTube Music',
-  defaultWidth: 1280,
-  defaultHeight: 800,
-  preloadFile: path.join(__dirname, '../../preload/index.js'),
-  // ... mais configs
-};
+```
+┌─────────────────────────────────────────┐
+│         Main Process (Node.js)          │
+├─────────────────────────────────────────┤
+│ • Gerenciamento de janelas              │
+│ • Serviços de negócio                   │
+│ • IPC bidirecional                      │
+│ • Atalhos globais                       │
+└──────────────┬──────────────────────────┘
+               │
+         ┌─────┴─────┐
+         │ Preload   │
+         │ Scripts   │
+         └─────┬─────┘
+               │
+┌──────────────┴──────────────┐
+│   Renderer Process          │
+│  (YouTube Music Web)        │
+└─────────────────────────────┘
 ```
 
----
-
-## 📡 Comunicação IPC
-
-A aplicação usa IPC (Inter-Process Communication) para comunicação:
-
-### Track Observer
-```javascript
-// Quando uma track muda no YouTube Music
-ipcMain.on('track-changed', (event, trackData) => {
-  // Processa dados da track
-});
-```
-
-### Account Switcher
-```javascript
-// Ao mudar de conta
-ipcMain.on('account-switched', (event, accountData) => {
-  // Carrega perfil da nova conta
-});
-```
+Para mais detalhes, veja [PROJETO.md](PROJETO.md)
 
 ---
 
-## 🛡️ Segurança
+## 📖 Como Usar
 
-- ✅ **Context Isolation** ativado
-- ✅ **Preload script** como única ponte com Node.js
-- ✅ **User-Agent inteligente** para evitar detecção
-- ✅ **Session partitions** por conta de usuário
-- ✅ **Sem eval()** ou code execution dinâmico
+### Atalhos Globais
 
----
+| Atalho | Ação |
+|--------|------|
+| `Media Play/Pause` | Play/Pausa |
+| `Media Next` | Próxima música |
+| `Media Previous` | Música anterior |
+| `Tray` | Minimizar/Restaurar |
 
-## 📝 Scripts Disponíveis
+### Gerenciamento de Contas
 
-| Comando | Descrição |
-|---------|-----------|
-| `npm start` | Inicia aplicação (produção) |
-| `npm run dev` | Inicia aplicação (desenvolvimento) |
-| `npm run build` | Cria instalador Windows |
+1. Clique no **ícone de usuário** na barra superior
+2. Selecione **Adicionar conta**
+3. Faça login com sua conta Google
+4. Use o **seletor de conta** para trocar entre perfis
 
----
+### Bloqueio de Anúncios
 
-## 🐛 Troubleshooting
-
-### Problema: Aplicação não inicia
-```bash
-# Limpar cache de node_modules
-rm -r node_modules
-npm install
-npm start
-```
-
-### Problema: Anúncios não são bloqueados
-- Verificar atualização dos filtros de adblock
-- Consultar logs da aplicação
-- Verificar se o serviço de adblock está ativo
-
-### Problema: IPC não funciona
-- Garantir que preload script está sendo carregado
-- Verificar context isolation está ativado
-- Checar console para erros de comunicação
+- **Automático** - Ativado por padrão
+- **Configuração** - Menu > Preferências > Bloquear Anúncios
 
 ---
 
-## 🤝 Contribuindo
+## 🐛 Solução de Problemas
 
-Contribuições são bem-vindas! Por favor:
+### A aplicação não inicia
+- Verifique se o Windows 10+ está atualizado
+- Execute novamente o instalador como administrador
+- Verifique se há espaço em disco
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+### Login não funciona
+- Limpe o cache: `%APPDATA%\YouTube Music\`
+- Desative VPN/Proxy temporariamente
+- Tente novamente com outra conta
+
+### Atalhos globais não funcionam
+- Verifique permissões no Windows
+- Desative aplicações que capturem teclas de mídia
+- Reinicie a aplicação
+
+### Anúncios não são bloqueados
+- Verifique conexão com internet
+- Atualize a aplicação para a versão mais recente
+- Limpe o cache do navegador
 
 ---
 
-## 📄 Licença
+## 🤝 Contribuição
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Contribuições são **bem-vindas**! 
+
+### Como contribuir
+
+1. **Fork** o repositório
+2. **Crie** uma branch (`git checkout -b feature/MinhaFeature`)
+3. **Commit** suas mudanças (`git commit -m 'Add: MinhaFeature'`)
+4. **Push** para a branch (`git push origin feature/MinhaFeature`)
+5. **Abra** um Pull Request
+
+Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes detalhadas.
+
+### Áreas para Contribuição
+
+- 🐛 Correção de bugs
+- ✨ Novas features
+- 📚 Documentação
+- 🎨 UI/UX melhorias
+- 🧪 Testes
 
 ---
 
-## 👨‍💻 Autor
+## 📝 Changelog
 
-**Matteus Alves**
-- GitHub: [@AllvesMatteus](https://github.com/AllvesMatteus)
+### v1.0.0 (2026-08-31)
+- ✅ Aplicação base completa
+- ✅ Suporte multi-contas
+- ✅ Bloqueio de anúncios integrado
+- ✅ Atalhos globais
+- ✅ Persistência de estado
+- ✅ System tray
+- ✅ Instalador NSIS
+
+Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo.
 
 ---
 
 ## 📞 Suporte
 
-Para dúvidas, issues ou sugestões, abra uma [issue no GitHub](https://github.com/AllvesMatteus/youtube-music/issues).
+- 📧 **Email**: [adicionar email de contato]
+- 💬 **Issues**: [GitHub Issues](https://github.com/AllvesMatteus/youtube-music-desktop/issues)
+- 📖 **Documentação**: [PROJETO.md](PROJETO.md)
 
 ---
 
-## 🎯 Roadmap
+## 📄 Licença
 
-- [ ] Suporte a macOS e Linux
-- [ ] Temas customizáveis
-- [ ] Plugin system
-- [ ] Sincronização de playlists
-- [ ] Integração com Spotify
-- [ ] Notificações de novas releases
+Este projeto é licenciado sob a **Licença MIT** - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**Desenvolvido com ❤️ para amantes de música**
+## ⚖️ Aviso Legal
+
+Este projeto é uma **aplicação não oficial** para YouTube Music. 
+
+- Não é afiliado, endorsado ou patrocinado pelo Google/YouTube
+- Use por sua conta e risco
+- Respeite os [Termos de Serviço](https://www.youtube.com/t/terms) do YouTube Music
+- O bloqueio de anúncios pode violar os ToS - use responsavelmente
+
+---
+
+## 🙏 Créditos
+
+- [Electron](https://www.electronjs.org) - Framework
+- [@ghostery/adblocker-electron](https://github.com/ghostery/adblocker) - Bloqueador de anúncios
+- [Electron Builder](https://www.electron.build) - Build system
+
+---
+
+<div align="center">
+
+Feito com ❤️ por [AllvesMatteus](https://github.com/AllvesMatteus)
+
+[⬆ Voltar ao Topo](#-youtube-music-desktop)
+
+</div>
