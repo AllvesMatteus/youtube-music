@@ -1,11 +1,10 @@
 const { app } = require('electron');
 const config = require('./config/appConfig');
-const { createMainWindow } = require('./windows/mainWindow');
+const { createMainWindow, registerMiniPlayerIpc, showMiniPlayer } = require('./windows/mainWindow');
 const { createSplashWindow } = require('./windows/splashWindow');
 const mediaKeysService = require('./services/mediaKeysService');
 const { registerAppIpc } = require('./ipc/appIpc');
 const { createApplicationMenu } = require('./menus/applicationMenu');
-const startupService = require('./services/startupService');
 const settingsService = require('./services/settingsService');
 
 app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
@@ -31,13 +30,18 @@ if (!gotTheLock) {
 
     if (settingsService.get('alwaysOnTop')) mainWindow.setAlwaysOnTop(true);
     registerAppIpc(mainWindow);
+    registerMiniPlayerIpc();
     createApplicationMenu(mainWindow, () => {
       mainWindow.show();
       mainWindow.focus();
       mainWindow.webContents.send('open-account-manager');
-    });
+    }, showMiniPlayer);
 
     mediaKeysService.register(mainWindow);
+
+    if (settingsService.get('openMiniPlayerOnStart')) {
+      setTimeout(showMiniPlayer, 1200);
+    }
 
     app.on('activate', () => {
       if (!mainWindow || mainWindow.isDestroyed()) {
