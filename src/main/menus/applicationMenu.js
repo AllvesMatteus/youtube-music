@@ -2,7 +2,7 @@ const { Menu, app } = require('electron');
 const settingsService = require('../services/settingsService');
 const startupService = require('../services/startupService');
 
-function createApplicationMenu(mainWindow, onOpenAccounts) {
+function createApplicationMenu(mainWindow, onOpenAccounts, onOpenMiniPlayer) {
   const template = [
     {
       label: 'Aplicativo',
@@ -14,6 +14,12 @@ function createApplicationMenu(mainWindow, onOpenAccounts) {
               mainWindow.show();
               mainWindow.focus();
             }
+          }
+        },
+        {
+          label: 'Abrir mini player',
+          click: () => {
+            if (typeof onOpenMiniPlayer === 'function') onOpenMiniPlayer();
           }
         },
         {

@@ -17,7 +17,8 @@ function updateTrack(data = {}) {
   $('#duration').textContent = formatTime(state.duration);
   $('#current-time').textContent = formatTime(state.currentTime);
   $('#progress').value = state.duration ? (state.currentTime / state.duration) * 100 : 0;
-  $('#play-pause').textContent = data.isPlaying ? '❚❚' : '▶';
+  const playIcon = $('#play-pause img');
+  if (playIcon) playIcon.src = data.isPlaying ? '../../../assets/icons/pause.png' : '../../../assets/icons/play.png';
 }
 
 $('#previous').onclick = () => api.command('previous');
