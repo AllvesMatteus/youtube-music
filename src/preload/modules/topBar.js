@@ -33,6 +33,10 @@ function setupTopBar() {
   const modal = document.getElementById('ytm-account-modal');
   const renderAccounts = async () => { const { accounts, activeAccountId } = await ipcRenderer.invoke('get-accounts'); document.getElementById('accounts-list').innerHTML = accounts.map(acc => `<div class="account-item ${acc.id === activeAccountId ? 'active' : ''}" data-id="${acc.id}"><div class="account-info"><span class="account-name">${acc.name}</span>${acc.email ? `<span class="account-email">${acc.email}</span>` : ''}</div>${acc.id === activeAccountId ? '<span class="active-badge">Ativa</span>' : ''}</div>`).join(''); document.querySelectorAll('.account-item').forEach(item => item.onclick = async () => { if (item.dataset.id !== activeAccountId) await ipcRenderer.invoke('switch-account', item.dataset.id); modal.classList.add('hidden'); }); document.getElementById('active-user-name').textContent = accounts.find(acc => acc.id === activeAccountId)?.name || 'Contas'; };
   action('btn-user-switch', () => { modal.classList.toggle('hidden'); if (!modal.classList.contains('hidden')) renderAccounts(); });
+  ipcRenderer.on('open-account-manager', () => {
+    modal.classList.remove('hidden');
+    renderAccounts();
+  });
   action('btn-close-modal', () => modal.classList.add('hidden'));
   action('btn-add-account', async () => { const name = prompt('Nome da nova conta:', 'Conta 2'); if (name) await ipcRenderer.invoke('add-account', name); });
   renderAccounts();

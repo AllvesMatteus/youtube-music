@@ -2,6 +2,7 @@ const { Tray, Menu, app, nativeImage } = require('electron');
 const path = require('path');
 const config = require('../config/appConfig');
 const authService = require('./authService');
+const { showMiniPlayer, hideMiniPlayer, getMiniPlayerWindow } = require('../windows/miniPlayerWindow');
 
 class TrayService {
   constructor() {
@@ -30,9 +31,18 @@ class TrayService {
     this.tray = new Tray(trayIcon);
     this.tray.setToolTip(config.APP_NAME);
 
-    // Clique com o botão esquerdo: alterna entre mostrar e ocultar a janela
+    // Clique com o botão esquerdo: alterna entre mostrar e ocultar o mini player
     this.tray.on('click', () => {
-      this.toggleWindow(mainWindow);
+      const miniPlayer = getMiniPlayerWindow();
+      if (miniPlayer && !miniPlayer.isDestroyed()) {
+        if (miniPlayer.isVisible() && !miniPlayer.isMinimized()) {
+          hideMiniPlayer();
+        } else {
+          showMiniPlayer();
+        }
+        return;
+      }
+      showMiniPlayer();
     });
 
     this.updateMenu(mainWindow, ses);
@@ -61,50 +71,11 @@ class TrayService {
 
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: this.currentTrack ? this.currentTrack : 'YouTube Music',
-        icon: this.icons.equalizer,
-        enabled: false
-      },
-      { type: 'separator' },
-      {
-        label: 'Play / Pause',
-        icon: this.icons.play,
-        click: () => {
-          if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.webContents.send('media-play-pause');
-          }
-        }
+        label: 'Abrir mini player',
+        click: () => showMiniPlayer()
       },
       {
-        label: 'Próxima Música',
-        icon: this.icons.next,
-        click: () => {
-          if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.webContents.send('media-next');
-          }
-        }
-      },
-      {
-        label: 'Música Anterior',
-        icon: this.icons.previous,
-        click: () => {
-          if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.webContents.send('media-previous');
-          }
-        }
-      },
-      {
-        label: 'Parar',
-        icon: this.icons.stop,
-        click: () => {
-          if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.webContents.send('media-stop');
-          }
-        }
-      },
-      { type: 'separator' },
-      {
-        label: mainWindow && mainWindow.isVisible() ? 'Ocultar Janela' : 'Mostrar Janela',
+        label: mainWindow && mainWindow.isVisible() ? 'Ocultar janela principal' : 'Mostrar janela principal',
         click: () => this.toggleWindow(mainWindow)
       },
       {

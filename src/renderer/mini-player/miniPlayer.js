@@ -30,7 +30,30 @@ $('#shuffle').onclick = () => { $('#shuffle').classList.toggle('active'); api.co
 $('#account-button').onclick = () => api.openAccounts();
 $('#close-button').onclick = () => api.close();
 $('#progress').oninput = event => api.command({ type: 'seek', value: Number(event.target.value) });
-$('#settings').onclick = () => $('#settings-menu').classList.toggle('hidden');
+
+const settingsMenu = $('#settings-menu');
+const settingsButton = $('#settings');
+
+const closeSettingsMenu = () => settingsMenu.classList.add('hidden');
+
+settingsButton.onclick = event => {
+  event.stopPropagation();
+  settingsMenu.classList.toggle('hidden');
+};
+
+document.addEventListener('click', event => {
+  const clickedInsideMenu = settingsMenu.contains(event.target);
+  const clickedOnSettingsButton = settingsButton.contains(event.target);
+
+  if (!clickedInsideMenu && !clickedOnSettingsButton) {
+    closeSettingsMenu();
+  }
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeSettingsMenu();
+});
+
 $('#exit-app').onclick = () => api.command('exit');
 
 async function loadSettings() {
