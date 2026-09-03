@@ -19,7 +19,7 @@ function updateProgress(cur, dur) {
   const pct = dur > 0 ? (cur / dur) * 100 : 0;
   const bar = $('#progress');
   bar.value = pct;
-  bar.style.background = `linear-gradient(to right, #fff ${pct}%, rgba(255,255,255,0.2) ${pct}%)`;
+  bar.style.background = `linear-gradient(to right, #ffffff ${pct}%, rgba(255,255,255,0.22) ${pct}%)`;
 }
 
 function resetProgress() {
@@ -27,7 +27,7 @@ function resetProgress() {
   $('#current-time').textContent = '0:00';
   const bar = $('#progress');
   bar.value = 0;
-  bar.style.background = 'rgba(255,255,255,0.2)';
+  bar.style.background = 'linear-gradient(to right, #ffffff 0%, rgba(255,255,255,0.22) 0%)';
 }
 
 function setRepeatState(mode) {
@@ -215,3 +215,4 @@ setShuffleState(false);
 setLikeState(false);
 api.onTrackState(updateTrack);
 loadSettings();
+
