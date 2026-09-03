@@ -46,7 +46,7 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
   align-items: center;
   justify-content: center;
 }
-.icon-button img { width: 14px; height: 14px; object-fit: contain; opacity: 0.8; transition: opacity 0.15s, transform 0.12s; }
+.icon-button img { width: 14px; height: 14px; object-fit: contain; opacity: 0.55; transition: opacity 0.15s, transform 0.12s; }
 .icon-button:hover img { opacity: 1; transform: scale(1.1); }
 .icon-button.close { font-size: 22px; font-weight: 700; line-height: 1; color: #e53935; width: 24px; height: 24px; }
 .icon-button.close:hover { color: #ff6659; }
@@ -128,25 +128,32 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
 #progress {
   -webkit-appearance: none;
   width: 100%;
-  height: 2px;
-  border-radius: 1px;
+  height: 4px;
+  border-radius: 2px;
   background: rgba(255,255,255,0.2);
   cursor: pointer;
   outline: none;
   display: block;
+  padding: 4px 0;
+  box-sizing: content-box;
 }
 #progress::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   background: #fff;
   border-radius: 50%;
   cursor: pointer;
   margin-top: -4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  transition: transform 0.1s;
+}
+#progress:hover::-webkit-slider-thumb {
+  transform: scale(1.15);
 }
 #progress::-webkit-slider-runnable-track {
-  height: 2px;
-  border-radius: 1px;
+  height: 4px;
+  border-radius: 2px;
 }
 
 .time-row {
@@ -175,14 +182,14 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
   justify-content: center;
   flex-shrink: 0;
 }
-.footer-button img { width: 18px; height: 18px; object-fit: contain; opacity: 0.8; transition: opacity 0.15s, transform 0.12s; }
+.footer-button img { width: 18px; height: 18px; object-fit: contain; opacity: 0.55; transition: opacity 0.15s, transform 0.12s; }
 .footer-button:hover img { opacity: 1; transform: scale(1.1); }
 .footer-button:active img { transform: scale(0.92); }
 
-.footer-button.liked      img { filter: invert(23%) sepia(97%) saturate(5000%) hue-rotate(349deg) brightness(95%) !important; }
-.footer-button.repeat-all img { filter: invert(23%) sepia(97%) saturate(7000%) hue-rotate(349deg) brightness(95%) !important; }
-.footer-button.repeat-one img { filter: invert(40%) sepia(90%) saturate(2000%) hue-rotate(260deg) brightness(90%) !important; }
-.footer-button.shuffle-on img { filter: brightness(0) saturate(100%) invert(55%) sepia(80%) saturate(400%) hue-rotate(190deg) !important; }
+.footer-button.active img,
+.footer-button.liked img {
+  opacity: 1 !important;
+}
 
 .settings-backdrop {
   position: absolute;
@@ -365,4 +372,5 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
 }
 
 .hidden { display: none !important; }
+
 
