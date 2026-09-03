@@ -1,22 +1,28 @@
-const { BrowserWindow } = require('electron');
+﻿const { BrowserWindow } = require('electron');
 const path = require('path');
 const config = require('../config/appConfig');
+const windowStateService = require('../services/windowStateService');
+const settingsService = require('../services/settingsService');
 
 let miniPlayerWindow = null;
 
 function createMiniPlayerWindow() {
-  if (miniPlayerWindow && !miniPlayerWindow.isDestroyed()) {
-    return miniPlayerWindow;
-  }
+  if (miniPlayerWindow && !miniPlayerWindow.isDestroyed()) return miniPlayerWindow;
+
+  const savedPos = windowStateService.get('miniPlayer');
 
   miniPlayerWindow = new BrowserWindow({
-    width: 500,
-    height: 500,
-    minWidth: 420,
-    minHeight: 300,
+    width: 460,
+    height: 218,
+    minWidth: 460,
+    minHeight: 218,
+    maxWidth: 460,
+    maxHeight: 218,
+    x: savedPos ? savedPos.x : undefined,
+    y: savedPos ? savedPos.y : undefined,
     frame: false,
     transparent: true,
-    resizable: true,
+    resizable: false,
     show: false,
     backgroundColor: '#00000000',
     title: 'YouTube Music Mini Player',
@@ -29,12 +35,11 @@ function createMiniPlayerWindow() {
     }
   });
 
-  miniPlayerWindow.setAlwaysOnTop(false);
-  miniPlayerWindow.loadFile(path.join(__dirname, '../../renderer/mini-player/miniPlayer.html'));
-  miniPlayerWindow.on('closed', () => {
-    miniPlayerWindow = null;
-  });
+  windowStateService.track(miniPlayerWindow, 'miniPlayer');
 
+  miniPlayerWindow.setAlwaysOnTop(Boolean(settingsService.get('alwaysOnTop')));
+  miniPlayerWindow.loadFile(path.join(__dirname, '../../renderer/mini-player/miniPlayer.html'));
+  miniPlayerWindow.on('closed', () => { miniPlayerWindow = null; });
   return miniPlayerWindow;
 }
 
@@ -54,9 +59,5 @@ function hideMiniPlayer() {
   if (win) win.hide();
 }
 
-module.exports = {
-  createMiniPlayerWindow,
-  getMiniPlayerWindow,
-  showMiniPlayer,
-  hideMiniPlayer
-};
+module.exports = { createMiniPlayerWindow, getMiniPlayerWindow, showMiniPlayer, hideMiniPlayer };
+

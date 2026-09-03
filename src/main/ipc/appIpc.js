@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron');
+﻿const { ipcMain } = require('electron');
 const settingsService = require('../services/settingsService');
 const startupService = require('../services/startupService');
 
@@ -32,3 +32,4 @@ function registerAppIpc(mainWindow) {
 }
 
 module.exports = { registerAppIpc };
+

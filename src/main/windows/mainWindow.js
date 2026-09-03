@@ -1,4 +1,4 @@
-const { BrowserWindow, session, Menu, MenuItem, app, shell } = require('electron');
+﻿const { BrowserWindow, session, Menu, MenuItem, app, shell } = require('electron');
 const path = require('path');
 const config = require('../config/appConfig');
 const authService = require('../services/authService');
@@ -55,6 +55,13 @@ function registerMiniPlayerIpc() {
   });
 
   ipcMain.on('mini-player-minimize', () => hideMiniPlayer());
+  ipcMain.on('open-main-window', () => {
+    if (activeMainWindow && !activeMainWindow.isDestroyed()) {
+      activeMainWindow.show();
+      activeMainWindow.focus();
+    }
+  });
+
   ipcMain.on('open-account-manager', () => {
     if (activeMainWindow && !activeMainWindow.isDestroyed()) {
       activeMainWindow.show();
@@ -69,7 +76,7 @@ function createMainWindow(splashWindow = null) {
   const ses = session.fromPartition(currentPartition);
   authService.setupSessionHeaders(ses);
   adblockService.enable(ses);
-  const windowState = windowStateService.load();
+  const windowState = windowStateService.get('main');
   const iconPath = path.join(config.PATHS.ASSETS, 'icon.png');
 
   const win = new BrowserWindow({
@@ -77,6 +84,8 @@ function createMainWindow(splashWindow = null) {
     height: windowState.height || config.WINDOW.DEFAULT_HEIGHT,
     minWidth: config.WINDOW.MIN_WIDTH,
     minHeight: config.WINDOW.MIN_HEIGHT,
+    x: windowState.x !== undefined ? windowState.x : undefined,
+    y: windowState.y !== undefined ? windowState.y : undefined,
     title: config.APP_NAME,
     icon: iconPath,
     show: false,
@@ -88,13 +97,14 @@ function createMainWindow(splashWindow = null) {
       contextIsolation: false,
       nodeIntegration: false,
       plugins: false,
-      sandbox: false
+      sandbox: false,
+      backgroundThrottling: false
     }
   });
 
   activeMainWindow = win;
   if (settingsService.get('alwaysOnTop')) win.setAlwaysOnTop(true);
-  windowStateService.track(win);
+  windowStateService.track(win, 'main');
   win.webContents.setUserAgent(config.CHROME_UA);
   win.webContents.on('will-prevent-unload', event => event.preventDefault());
 
@@ -125,7 +135,8 @@ function createMainWindow(splashWindow = null) {
     const isGoogleAuth = url.includes('accounts.google.com') || url.includes('accounts.youtube.com');
     const isYTMusic = url.includes('music.youtube.com');
     if (!isGoogleAuth && !isYTMusic) { shell.openExternal(url); return { action: 'deny' }; }
-    return { action: 'allow', overrideBrowserWindowOptions: { autoHideMenuBar: true, backgroundColor: config.WINDOW.BACKGROUND_COLOR, webPreferences: { partition: currentPartition, contextIsolation: false, nodeIntegration: false, plugins: false, sandbox: false } } };
+    return { action: 'allow', overrideBrowserWindowOptions: { autoHideMenuBar: true, backgroundColor: config.WINDOW.BACKGROUND_COLOR, webPreferences: { partition: currentPartition, contextIsolation: false, nodeIntegration: false, plugins: false, sandbox: false,
+      backgroundThrottling: false } } };
   });
 
   win.webContents.on('did-create-window', childWindow => childWindow.webContents.setUserAgent(config.CHROME_UA));
@@ -157,3 +168,8 @@ module.exports = {
   getMiniPlayerWindow,
   registerMiniPlayerIpc
 };
+
+
+
+
+

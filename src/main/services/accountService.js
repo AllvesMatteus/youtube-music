@@ -17,7 +17,6 @@ class AccountService {
       console.error('[AccountService] Erro ao carregar contas:', e);
     }
 
-    // Estrutura padrão inicial
     const defaultData = {
       activeAccountId: 'account_default',
       accounts: [

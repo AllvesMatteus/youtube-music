@@ -1,10 +1,10 @@
-const { ipcRenderer } = require('electron');
+﻿const { ipcRenderer } = require('electron');
 
 function setupTrackObserver() {
   const updateTrackInfo = () => {
-    const titleEl = document.querySelector('ytmusic-player-bar .title') || 
+    const titleEl = document.querySelector('ytmusic-player-bar .title') ||
                     document.querySelector('.ytmusic-player-bar.title');
-    const bylineEl = document.querySelector('ytmusic-player-bar .byline') || 
+    const bylineEl = document.querySelector('ytmusic-player-bar .byline') ||
                      document.querySelector('.ytmusic-player-bar.byline');
 
     const title = titleEl ? titleEl.textContent.trim() : '';
@@ -16,7 +16,7 @@ function setupTrackObserver() {
   };
 
   const observer = new MutationObserver(updateTrackInfo);
-  
+
   const checkPlayerBar = setInterval(() => {
     const playerBar = document.querySelector('ytmusic-player-bar');
     if (playerBar) {

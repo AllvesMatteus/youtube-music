@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+﻿const { contextBridge, ipcRenderer } = require('electron');
 
 const api = {
   onTrackState: callback => ipcRenderer.on('mini-player-track-state', (event, state) => callback(state)),
@@ -8,6 +8,7 @@ const api = {
   close: () => ipcRenderer.send('mini-player-close'),
   minimize: () => ipcRenderer.send('mini-player-minimize'),
   openAccounts: () => ipcRenderer.send('open-account-manager'),
+  openMainWindow: () => ipcRenderer.send('open-main-window'),
   onRequestAddAccount: callback => ipcRenderer.on('open-add-account', callback)
 };
 

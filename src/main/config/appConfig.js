@@ -4,9 +4,7 @@ module.exports = {
   APP_NAME: 'YouTube Music Desktop',
   YTMUSIC_URL: 'https://music.youtube.com',
   LOGIN_URL: 'https://accounts.google.com/ServiceLogin?service=youtube&continue=https://music.youtube.com',
-  // User-Agent padrão para reprodução no YouTube Music (Chrome)
   CHROME_UA: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
-  // User-Agent especial para a tela de login do Google (Firefox - bypassa 100% dos testes de automação do Chromium)
   FIREFOX_LOGIN_UA: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0',
   SESSION_PARTITION: 'persist:youtube-music',
   PATHS: {

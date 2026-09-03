@@ -1,4 +1,4 @@
-const { app } = require('electron');
+﻿const { app } = require('electron');
 const config = require('./config/appConfig');
 const { createMainWindow, registerMiniPlayerIpc, showMiniPlayer } = require('./windows/mainWindow');
 const { createSplashWindow } = require('./windows/splashWindow');
@@ -8,7 +8,10 @@ const { createApplicationMenu } = require('./menus/applicationMenu');
 const settingsService = require('./services/settingsService');
 
 app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
-app.commandLine.appendSwitch('disable-features', 'CrossOriginOpenerPolicy');
+app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,CrossOriginOpenerPolicy');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-zero-copy');
+app.commandLine.appendSwitch('renderer-process-limit', '4');
 app.userAgentFallback = config.CHROME_UA;
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -59,3 +62,5 @@ if (!gotTheLock) {
     if (process.platform !== 'darwin') app.quit();
   });
 }
+
+

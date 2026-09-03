@@ -1,6 +1,5 @@
 function setupAdSkipper() {
   setInterval(() => {
-    // 1. Clica automaticamente em qualquer botão de "Pular anúncio"
     const skipButtons = [
       '.ytp-ad-skip-button',
       '.ytp-ad-skip-button-modern',
@@ -18,7 +17,6 @@ function setupAdSkipper() {
       }
     }
 
-    // 2. Se houver anúncio em vídeo tocando, acelera para o final
     const adVideo = document.querySelector('.ad-showing video');
     if (adVideo && !isNaN(adVideo.duration) && isFinite(adVideo.duration)) {
       adVideo.currentTime = adVideo.duration;

@@ -1,37 +1,24 @@
-const { globalShortcut } = require('electron');
+﻿const { globalShortcut } = require('electron');
 
 class MediaKeysService {
   register(mainWindow) {
     try {
-      // Tecla Play / Pause
-      globalShortcut.register('MediaPlayPause', () => {
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('media-play-pause');
-        }
-      });
+      this.unregisterAll();
 
-      // Tecla Próxima Faixa
-      globalShortcut.register('MediaNextTrack', () => {
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('media-next');
-        }
-      });
+      const bindings = [
+        { key: 'MediaPlayPause', event: 'media-play-pause' },
+        { key: 'MediaNextTrack', event: 'media-next' },
+        { key: 'MediaPreviousTrack', event: 'media-previous' },
+        { key: 'MediaStop', event: 'media-stop' }
+      ];
 
-      // Tecla Faixa Anterior
-      globalShortcut.register('MediaPreviousTrack', () => {
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('media-previous');
-        }
+      bindings.forEach(({ key, event }) => {
+        globalShortcut.register(key, () => {
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send(event);
+          }
+        });
       });
-
-      // Tecla Parar
-      globalShortcut.register('MediaStop', () => {
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('media-stop');
-        }
-      });
-
-      console.log('[MediaKeysService] ⌨️ Teclas globais de mídia registradas com sucesso.');
     } catch (error) {
       console.error('[MediaKeysService] Erro ao registrar teclas de atalho:', error);
     }
@@ -39,7 +26,6 @@ class MediaKeysService {
 
   unregisterAll() {
     globalShortcut.unregisterAll();
-    console.log('[MediaKeysService] Teclas globais desregistradas.');
   }
 }
 

@@ -1,43 +1,124 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Music Mini Player</title>
+  <title>Mini Player</title>
   <link rel="stylesheet" href="./miniPlayer.css">
 </head>
 <body>
-  <main class="mini-player" aria-label="Mini player do YouTube Music">
+  <main class="mini-player">
+
     <header class="window-actions">
-      <button id="account-button" class="icon-button" title="Gerenciar contas" aria-label="Gerenciar contas"><img src="../../../assets/icons/avatar.png" alt="Conta"></button>
-      <button id="close-button" class="icon-button close" title="Fechar" aria-label="Fechar">×</button>
+      <button id="account-button" class="icon-button" title="Contas">
+        <img src="../../../assets/icons/user.svg" alt="Conta">
+      </button>
+      <button id="close-button" class="icon-button close" title="Fechar">&times;</button>
     </header>
-    <section class="track-section">
-      <img id="cover" class="cover" alt="Capa da música" src="../../../assets/icon.png">
-      <div class="track-meta"><h1 id="title">Nenhuma música tocando</h1><p id="artist">YouTube Music</p></div>
-    </section>
-    <section class="player-controls">
-      <button id="previous" class="control" title="Música anterior" aria-label="Música anterior"><img src="../../../assets/icons/previous.png" alt="Anterior"></button>
-      <button id="play-pause" class="control play" title="Reproduzir ou pausar" aria-label="Reproduzir ou pausar"><img src="../../../assets/icons/play.png" alt="Reproduzir"></button>
-      <button id="next" class="control" title="Próxima música" aria-label="Próxima música"><img src="../../../assets/icons/next.png" alt="Próxima"></button>
-    </section>
-    <section class="progress-section">
-      <input id="progress" type="range" min="0" max="100" value="0" aria-label="Progresso da música">
-      <div class="time"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
-    </section>
-    <footer class="footer-controls">
-      <button id="like" class="footer-button" title="Curtir" aria-label="Curtir"><img src="../../../assets/icons/like.png" alt="Curtir"></button>
-      <button id="repeat" class="footer-button" title="Repetir" aria-label="Repetir"><img src="../../../assets/icons/repeat.png" alt="Repetir"></button>
-      <span class="spacer"></span>
-      <button id="shuffle" class="footer-button" title="Aleatório" aria-label="Aleatório"><img src="../../../assets/icons/shuffle.png" alt="Aleatório"></button>
-      <button id="settings" class="footer-button" title="Opções" aria-label="Opções"><img src="../../../assets/icons/settings.png" alt="Opções"></button>
-    </footer>
-    <div id="settings-menu" class="settings-menu hidden" role="menu">
-      <label><input id="start-with-windows" type="checkbox"> Iniciar com o Windows</label>
-      <label><input id="close-to-tray" type="checkbox"> Manter aberto ao clicar no X</label>
-      <label><input id="always-on-top" type="checkbox"> Manter sempre no topo</label>
-      <button id="exit-app" class="exit-option">Fechar aplicativo completamente</button>
+
+    <div class="top-section">
+      <img id="cover" class="cover" alt="Capa" src="../../../assets/icon.png">
+      <div class="right-panel">
+        <p class="track-title" id="title">Nenhuma musica tocando</p>
+        <p class="track-artist" id="artist">YouTube Music</p>
+        <div class="player-controls">
+          <button id="previous" class="control" title="Anterior">
+            <img src="../../../assets/icons/prev.svg" alt="Anterior">
+          </button>
+          <button id="play-pause" class="control play" title="Play/Pause">
+            <img src="../../../assets/icons/play.svg" alt="Play">
+          </button>
+          <button id="next" class="control" title="Proxima">
+            <img src="../../../assets/icons/next.svg" alt="Proxima">
+          </button>
+        </div>
+      </div>
     </div>
+
+    <section class="progress-section">
+      <input id="progress" type="range" min="0" max="100" value="0">
+      <div class="time-row">
+        <span id="current-time">0:00</span>
+        <span id="duration">0:00</span>
+      </div>
+    </section>
+
+    <footer class="footer-controls">
+      <div class="footer-left">
+        <button id="like" class="footer-button" title="Curtir">
+          <img src="../../../assets/icons/like.svg" alt="Curtir">
+        </button>
+        <button id="repeat" class="footer-button" title="Repetir">
+          <img src="../../../assets/icons/repeat.svg" alt="Repetir">
+        </button>
+      </div>
+      <div class="footer-right">
+        <button id="shuffle" class="footer-button" title="Aleatorio">
+          <img src="../../../assets/icons/shuffle.svg" alt="Aleatorio">
+        </button>
+        <button id="settings" class="footer-button" title="Configuracoes">
+          <img src="../../../assets/icons/gear.svg" alt="Config">
+        </button>
+      </div>
+    </footer>
+
+    <div id="settings-backdrop" class="settings-backdrop hidden"></div>
+
+    <div id="settings-menu" class="settings-menu hidden" role="menu">
+      <div class="settings-header">Ajustes</div>
+      
+      <label class="settings-row">
+        <div class="settings-row-left">
+          <img src="../../../assets/icons/pin.svg" alt="">
+          <span>Sempre no topo</span>
+        </div>
+        <div class="toggle-switch">
+          <input id="always-on-top" type="checkbox">
+          <span class="toggle-slider"></span>
+        </div>
+      </label>
+
+      <label class="settings-row">
+        <div class="settings-row-left">
+          <img src="../../../assets/icons/startup.svg" alt="">
+          <span>Iniciar com Windows</span>
+        </div>
+        <div class="toggle-switch">
+          <input id="start-with-windows" type="checkbox">
+          <span class="toggle-slider"></span>
+        </div>
+      </label>
+
+      <label class="settings-row">
+        <div class="settings-row-left">
+          <img src="../../../assets/icons/minimize-tray.svg" alt="">
+          <span>Minimizar ao fechar</span>
+        </div>
+        <div class="toggle-switch">
+          <input id="close-to-tray" type="checkbox">
+          <span class="toggle-slider"></span>
+        </div>
+      </label>
+
+      <div class="settings-separator"></div>
+
+      <button id="open-full-player" class="settings-action-button">
+        <div class="settings-row-left">
+          <img src="../../../assets/icons/expand.svg" alt="">
+          <span>Abrir YouTube Music</span>
+        </div>
+        <div class="settings-action-arrow">
+          <img src="../../../assets/icons/chevron-right.svg" alt="">
+        </div>
+      </button>
+
+      <div class="settings-separator"></div>
+
+      <button id="exit-app" class="exit-option">
+        <img src="../../../assets/icons/exit.svg" alt="">
+        <span>Fechar aplicativo</span>
+      </button>
+    </div>
+
   </main>
   <script src="./miniPlayer.js"></script>
 </body>

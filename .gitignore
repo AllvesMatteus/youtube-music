@@ -1,4 +1,4 @@
-# Dependencies
+﻿# Dependencies
 node_modules/
 package-lock.json
 yarn.lock
@@ -49,3 +49,4 @@ out/
 tmp/
 temp/
 *.tmp
+

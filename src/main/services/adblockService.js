@@ -10,12 +10,10 @@ class AdblockService {
   async enable(session) {
     try {
       if (!this.blocker) {
-        // Carrega filtros pré-compilados do Ghostery (EasyList + EasyPrivacy)
         this.blocker = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetch);
         this.isInitialized = true;
       }
       
-      // Ativa o bloqueador na sessão persistente do YouTube Music
       this.blocker.enableBlockingInSession(session);
       console.log('[AdblockService] 🛡️ Bloqueador de anúncios ativado com sucesso.');
     } catch (error) {
