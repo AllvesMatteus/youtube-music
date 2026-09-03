@@ -46,8 +46,8 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
   align-items: center;
   justify-content: center;
 }
-.icon-button img { width: 14px; height: 14px; object-fit: contain; transition: filter 0.15s; }
-.icon-button:hover img { filter: brightness(1.6); }
+.icon-button img { width: 14px; height: 14px; object-fit: contain; opacity: 0.8; transition: opacity 0.15s, transform 0.12s; }
+.icon-button:hover img { opacity: 1; transform: scale(1.1); }
 .icon-button.close { font-size: 22px; font-weight: 700; line-height: 1; color: #e53935; width: 24px; height: 24px; }
 .icon-button.close:hover { color: #ff6659; }
 
@@ -113,8 +113,9 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
   justify-content: center;
   flex-shrink: 0;
 }
-.control img { width: 26px; height: 26px; object-fit: contain; transition: filter 0.15s; }
-.control:hover img { filter: brightness(0) saturate(100%) invert(75%); }
+.control img { width: 26px; height: 26px; object-fit: contain; opacity: 0.9; transition: opacity 0.15s, transform 0.12s; }
+.control:hover img { opacity: 1; transform: scale(1.08); }
+.control:active img { transform: scale(0.92); }
 
 .control.play { width: 30px; height: 30px; }
 .control.play img { width: 30px; height: 30px; }
@@ -174,8 +175,9 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
   justify-content: center;
   flex-shrink: 0;
 }
-.footer-button img { width: 18px; height: 18px; object-fit: contain; transition: filter 0.15s; }
-.footer-button:hover img { filter: brightness(0) saturate(100%) invert(75%); }
+.footer-button img { width: 18px; height: 18px; object-fit: contain; opacity: 0.8; transition: opacity 0.15s, transform 0.12s; }
+.footer-button:hover img { opacity: 1; transform: scale(1.1); }
+.footer-button:active img { transform: scale(0.92); }
 
 .footer-button.liked      img { filter: invert(23%) sepia(97%) saturate(5000%) hue-rotate(349deg) brightness(95%) !important; }
 .footer-button.repeat-all img { filter: invert(23%) sepia(97%) saturate(7000%) hue-rotate(349deg) brightness(95%) !important; }
@@ -363,3 +365,4 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
 }
 
 .hidden { display: none !important; }
+
