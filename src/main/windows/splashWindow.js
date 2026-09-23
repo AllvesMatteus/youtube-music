@@ -6,8 +6,8 @@ function createSplashWindow() {
   const iconPath = path.join(config.PATHS.ASSETS, 'icon.png');
 
   const splash = new BrowserWindow({
-    width: 380,
-    height: 420,
+    width: 320,
+    height: 240,
     transparent: true,
     frame: false,
     alwaysOnTop: true,

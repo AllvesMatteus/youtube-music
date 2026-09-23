@@ -1,4 +1,4 @@
-﻿const { ipcRenderer } = require('electron');
+const { ipcRenderer } = require('electron');
 
 function setupPlayerController() {
   const getVideo = () => document.querySelector('video');
@@ -120,12 +120,35 @@ function setupPlayerController() {
     });
   };
 
-  ipcRenderer.on('media-play-pause', () =>
-    getPlayPauseButton()?.click() || (() => { const v = getVideo(); if (v) v.paused ? v.play() : v.pause(); })()
-  );
+  ipcRenderer.on('media-play-pause', () => {
+    const btn = getPlayPauseButton();
+    if (btn) {
+      btn.click();
+    } else {
+      const v = getVideo();
+      if (v) {
+        if (v.paused) v.play();
+        else v.pause();
+      }
+    }
+  });
   ipcRenderer.on('media-next',     () => getNextButton()?.click());
   ipcRenderer.on('media-previous', () => getPreviousButton()?.click());
   ipcRenderer.on('media-stop',     () => { const v = getVideo(); if (v && !v.paused) v.pause(); });
+  ipcRenderer.on('media-volume-up', () => {
+    const v = getVideo();
+    if (v) {
+      v.volume = Math.min(1, Math.round((v.volume + 0.05) * 100) / 100);
+      sendState();
+    }
+  });
+  ipcRenderer.on('media-volume-down', () => {
+    const v = getVideo();
+    if (v) {
+      v.volume = Math.max(0, Math.round((v.volume - 0.05) * 100) / 100);
+      sendState();
+    }
+  });
 
   ipcRenderer.on('mini-player-command', (event, command) => {
     if (command === 'play-pause') getPlayPauseButton()?.click();

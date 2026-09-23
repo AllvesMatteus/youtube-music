@@ -1,7 +1,8 @@
-﻿const { Tray, Menu, app, nativeImage } = require('electron');
+const { Tray, Menu, app, nativeImage } = require('electron');
 const path = require('path');
 const config = require('../config/appConfig');
-const { showMiniPlayer, hideMiniPlayer, getMiniPlayerWindow } = require('../windows/miniPlayerWindow');
+const settingsService = require('./settingsService');
+const { showMiniPlayer, hideMiniPlayer, getMiniPlayerWindow, isMiniPlayerActive, setMiniPlayerActive, isMiniPlayerEnabled } = require('../windows/miniPlayerWindow');
 
 class TrayService {
   constructor() {
@@ -19,50 +20,89 @@ class TrayService {
     this.tray = new Tray(icon);
     this.tray.setToolTip(config.APP_NAME);
 
+    // Clique com botão esquerdo: abre a janela normal ou o mini player (se ativo)
     this.tray.on('click', () => {
       const mp = getMiniPlayerWindow();
-      if (mp && !mp.isDestroyed()) {
-        if (mp.isVisible() && !mp.isMinimized()) { hideMiniPlayer(); return; }
-        showMiniPlayer(); return;
+      const miniActive = isMiniPlayerActive();
+
+      if (miniActive && isMiniPlayerEnabled()) {
+        if (mp && mp.isVisible() && !mp.isMinimized() && mp.isFocused()) {
+          hideMiniPlayer();
+        } else {
+          showMiniPlayer();
+        }
+        return;
       }
-      showMiniPlayer();
+
+      // Se o mini player não estiver ativo, abre normalmente a janela do YouTube Music
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        if (mainWindow.isVisible() && !mainWindow.isMinimized() && mainWindow.isFocused()) {
+          mainWindow.hide();
+        } else {
+          if (mainWindow.isMinimized()) mainWindow.restore();
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      }
     });
 
     this.tray.on('right-click', () => {
       if (this.tray && this.contextMenu) this.tray.popUpContextMenu(this.contextMenu);
     });
 
-    this.updateMenu(mainWindow);
+    this.updateMenu(mainWindow, ses);
   }
 
   setTrackInfo(mainWindow, ses, { title }) {
     this.currentTitle = title || null;
     if (this.tray) {
       this.tray.setToolTip(this.currentTitle || config.APP_NAME);
-      this.updateMenu(mainWindow);
+      this.updateMenu(mainWindow, ses);
     }
   }
 
-  updateMenu(mainWindow) {
+  updateMenu(mainWindow, ses) {
     if (!this.tray) return;
 
     this.contextMenu = Menu.buildFromTemplate([
       {
         label: 'Abrir YouTube Music',
         click: () => {
+          setMiniPlayerActive(false);
           if (mainWindow && !mainWindow.isDestroyed()) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
             mainWindow.show();
             mainWindow.focus();
           }
         }
       },
       {
-        label: 'Mini Player',
-        click: () => showMiniPlayer()
+        label: 'Atualizar / Recarregar (F5)',
+        click: () => {
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.reload();
+          }
+        }
       },
       { type: 'separator' },
       {
-        label: 'Fechar tudo',
+        label: 'Configurações...',
+        click: () => {
+          const { createSettingsWindow } = require('../windows/settingsWindow');
+          createSettingsWindow(mainWindow);
+        }
+      },
+      {
+        label: 'Mini Player (F3)' + (settingsService.get('miniPlayerEnabled') !== false ? '' : ' (Desativado)'),
+        enabled: settingsService.get('miniPlayerEnabled') !== false,
+        click: () => {
+          const { toggleMiniPlayer } = require('../windows/miniPlayerWindow');
+          toggleMiniPlayer();
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'Fechar Aplicativo',
         click: () => { app.isQuitting = true; app.quit(); }
       }
     ]);

@@ -1,4 +1,4 @@
-﻿const { BrowserWindow } = require('electron');
+const { BrowserWindow } = require('electron');
 const path = require('path');
 const config = require('../config/appConfig');
 const windowStateService = require('../services/windowStateService');
@@ -47,7 +47,25 @@ function getMiniPlayerWindow() {
   return miniPlayerWindow && !miniPlayerWindow.isDestroyed() ? miniPlayerWindow : null;
 }
 
+function isMiniPlayerEnabled() {
+  return settingsService.get('miniPlayerEnabled') !== false;
+}
+
+let miniPlayerActive = false;
+
+function isMiniPlayerActive() {
+  const mp = getMiniPlayerWindow();
+  if (mp && !mp.isDestroyed() && mp.isVisible()) return true;
+  return miniPlayerActive;
+}
+
+function setMiniPlayerActive(active) {
+  miniPlayerActive = Boolean(active);
+}
+
 function showMiniPlayer() {
+  if (!isMiniPlayerEnabled()) return null;
+  miniPlayerActive = true;
   const win = getMiniPlayerWindow() || createMiniPlayerWindow();
   win.show();
   win.focus();
@@ -59,5 +77,37 @@ function hideMiniPlayer() {
   if (win) win.hide();
 }
 
-module.exports = { createMiniPlayerWindow, getMiniPlayerWindow, showMiniPlayer, hideMiniPlayer };
+function closeMiniPlayer() {
+  miniPlayerActive = false;
+  const win = getMiniPlayerWindow();
+  if (win && !win.isDestroyed()) {
+    win.close();
+  }
+}
 
+function toggleMiniPlayer() {
+  if (!isMiniPlayerEnabled()) {
+    hideMiniPlayer();
+    miniPlayerActive = false;
+    return;
+  }
+  const win = getMiniPlayerWindow();
+  if (win && win.isVisible()) {
+    hideMiniPlayer();
+    miniPlayerActive = false;
+  } else {
+    showMiniPlayer();
+  }
+}
+
+module.exports = {
+  createMiniPlayerWindow,
+  getMiniPlayerWindow,
+  showMiniPlayer,
+  hideMiniPlayer,
+  closeMiniPlayer,
+  toggleMiniPlayer,
+  isMiniPlayerEnabled,
+  isMiniPlayerActive,
+  setMiniPlayerActive
+};

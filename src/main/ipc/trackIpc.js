@@ -1,4 +1,4 @@
-﻿const { ipcMain } = require('electron');
+const { ipcMain } = require('electron');
 const config = require('../config/appConfig');
 const trayService = require('../services/trayService');
 const { getMiniPlayerWindow, showMiniPlayer } = require('../windows/miniPlayerWindow');
@@ -20,6 +20,16 @@ function registerTrackIpc(mainWindow, ses) {
       if (title) mainWindow.setTitle(title);
       trayService.setTrackInfo(mainWindow, ses, { title, artist });
     }
+
+    try {
+      const discordService = require('../services/discordService');
+      discordService.updateActivity(state);
+    } catch (_) {}
+
+    try {
+      const notificationService = require('../services/notificationService');
+      notificationService.showTrackNotification(state);
+    } catch (_) {}
   });
 
   ipcMain.on('open-mini-player', () => showMiniPlayer());

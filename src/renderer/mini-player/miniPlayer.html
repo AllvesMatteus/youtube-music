@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -9,8 +9,8 @@
   <main class="mini-player">
 
     <header class="window-actions">
-      <button id="account-button" class="icon-button" title="Contas">
-        <img src="../../../assets/icons/user.svg" alt="Conta">
+      <button id="open-window-button" class="icon-button" title="Abrir janela">
+        <img src="../../../assets/icons/expand.svg" alt="Abrir janela">
       </button>
       <button id="close-button" class="icon-button close" title="Fechar">&times;</button>
     </header>
@@ -18,8 +18,8 @@
     <div class="top-section">
       <img id="cover" class="cover" alt="Capa" src="../../../assets/icon.png">
       <div class="right-panel">
-        <p class="track-title" id="title">Nenhuma musica tocando</p>
-        <p class="track-artist" id="artist">YouTube Music</p>
+        <p class="track-title" id="title" title="Clique para abrir a janela principal">Nenhuma musica tocando</p>
+        <p class="track-artist" id="artist" title="Clique para abrir a janela principal">YouTube Music</p>
         <div class="player-controls">
           <button id="previous" class="control" title="Anterior">
             <img src="../../../assets/icons/prev.svg" alt="Anterior">
@@ -52,9 +52,6 @@
         </button>
       </div>
       <div class="footer-right">
-        <button id="shuffle" class="footer-button" title="Aleatorio">
-          <img src="../../../assets/icons/shuffle.svg" alt="Aleatorio">
-        </button>
         <button id="settings" class="footer-button" title="Configuracoes">
           <img src="../../../assets/icons/gear.svg" alt="Config">
         </button>

@@ -5,11 +5,28 @@ const path = require('path');
 class SettingsService {
   constructor() {
     this.file = path.join(app.getPath('userData'), 'settings.json');
+    this.defaultShortcuts = {
+      playPause: 'MediaPlayPause',
+      nextTrack: 'MediaNextTrack',
+      prevTrack: 'MediaPreviousTrack',
+      volumeUp: 'Ctrl+Alt+Up',
+      volumeDown: 'Ctrl+Alt+Down',
+      toggleMiniPlayer: 'F3'
+    };
+
     this.defaults = {
       startWithWindows: false,
       closeBehavior: 'tray',
       alwaysOnTop: false,
-      openMiniPlayerOnStart: false
+      miniPlayerEnabled: true,
+      openMiniPlayerOnStart: false,
+      autoUpdateEnabled: true,
+      hardwareAcceleration: true,
+      discordPresence: true,
+      trackNotifications: true,
+      theme: 'default',
+      customCss: '',
+      shortcuts: { ...this.defaultShortcuts }
     };
     this.settings = this.load();
   }
@@ -18,13 +35,23 @@ class SettingsService {
     try {
       if (fs.existsSync(this.file)) {
         const saved = JSON.parse(fs.readFileSync(this.file, 'utf8'));
-        return { ...this.defaults, ...saved };
+        return {
+          ...this.defaults,
+          ...saved,
+          shortcuts: {
+            ...this.defaultShortcuts,
+            ...(saved && saved.shortcuts ? saved.shortcuts : {})
+          }
+        };
       }
     } catch (error) {
       console.error('[SettingsService] Erro ao carregar configurações:', error);
     }
 
-    return { ...this.defaults };
+    return {
+      ...this.defaults,
+      shortcuts: { ...this.defaultShortcuts }
+    };
   }
 
   save() {
@@ -49,15 +76,53 @@ class SettingsService {
       return false;
     }
 
-    this.settings[key] = value;
+    if (key === 'shortcuts' && typeof value === 'object' && value !== null) {
+      this.settings.shortcuts = {
+        ...this.defaultShortcuts,
+        ...(this.settings.shortcuts || {}),
+        ...value
+      };
+    } else {
+      this.settings[key] = value;
+    }
     this.save();
     return true;
+  }
+
+  getShortcuts() {
+    return {
+      ...this.defaultShortcuts,
+      ...(this.settings.shortcuts || {})
+    };
+  }
+
+  setShortcut(action, accelerator) {
+    if (!this.settings.shortcuts) {
+      this.settings.shortcuts = { ...this.defaultShortcuts };
+    }
+    this.settings.shortcuts[action] = accelerator;
+    this.save();
+    return this.getShortcuts();
+  }
+
+  resetShortcuts() {
+    this.settings.shortcuts = { ...this.defaultShortcuts };
+    this.save();
+    return this.getShortcuts();
   }
 
   update(changes = {}) {
     Object.keys(changes).forEach(key => {
       if (Object.prototype.hasOwnProperty.call(this.defaults, key)) {
-        this.settings[key] = changes[key];
+        if (key === 'shortcuts' && typeof changes[key] === 'object' && changes[key] !== null) {
+          this.settings.shortcuts = {
+            ...this.defaultShortcuts,
+            ...(this.settings.shortcuts || {}),
+            ...changes[key]
+          };
+        } else {
+          this.settings[key] = changes[key];
+        }
       }
     });
     this.save();

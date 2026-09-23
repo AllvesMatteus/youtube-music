@@ -1,49 +1,79 @@
 {
-    "name":  "youtube-music-desktop",
-    "version":  "1.0.0",
-    "description":  "YouTube Music Desktop App - Modular \u0026 Scalable Architecture",
-    "author":  "YouTube Music Desktop",
-    "main":  "src/main/index.js",
-    "scripts":  {
-                    "start":  "electron .",
-                    "dev":  "electron .",
-                    "build":  "electron-builder --win"
-                },
-    "build":  {
-                  "appId":  "com.ytmusic.desktop",
-                  "productName":  "YouTube Music",
-                  "directories":  {
-                                      "output":  "dist"
-                                  },
-                  "files":  [
-                                "src/**/*",
-                                "assets/**/*",
-                                "package.json"
-                            ],
-                  "win":  {
-                              "target":  [
-                                             "nsis"
-                                         ],
-                              "icon":  "assets/icon.ico"
-                          },
-                  "nsis":  {
-                               "oneClick":  false,
-                               "allowToChangeInstallationDirectory":  true,
-                               "installerIcon":  "assets/icon.ico",
-                               "uninstallerIcon":  "assets/icon.ico",
-                               "installerHeaderIcon":  "assets/icon.ico",
-                               "shortcutName":  "YouTube Music",
-                               "createDesktopShortcut":  true,
-                               "createStartMenuShortcut":  true,
-                               "include":  "build/installer.nsh"
-                           }
-              },
-    "dependencies":  {
-                         "@ghostery/adblocker-electron":  "^2.18.2",
-                         "cross-fetch":  "^4.1.0"
-                     },
-    "devDependencies":  {
-                            "electron":  "^40.8.0",
-                            "electron-builder":  "^26.15.3"
-                        }
+  "name": "youtube-music-desktop",
+  "version": "1.1.0",
+  "description": "YouTube Music Desktop App - Modular & Scalable Architecture",
+  "author": {
+    "name": "AllvesMatteus",
+    "url": "https://github.com/AllvesMatteus/AllvesMatteus"
+  },
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder --win",
+    "build:dev": "electron-builder --win --dir",
+    "release": "electron-builder --win --publish always"
+  },
+  "build": {
+    "appId": "com.allvesmatteus.ytmusic",
+    "productName": "YouTube Music",
+    "copyright": "Copyright © 2026 AllvesMatteus",
+    "publish": {
+      "provider": "github",
+      "owner": "AllvesMatteus",
+      "repo": "youtube-music"
+    },
+    "compression": "maximum",
+    "electronLanguages": [
+      "pt-BR",
+      "en-US"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "!assets/base/**/*",
+      "!assets/folder.ico",
+      "!assets/MeuIcone.ico",
+      "!**/*.map",
+      "!**/*.ts",
+      "!**/*.d.ts",
+      "!**/*.md",
+      "!**/*.tsbuildinfo",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "shortcutName": "YouTube Music",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "include": "build/installer.nsh"
+    },
+    "extraFiles": [
+      {
+        "from": "assets/folder.ico",
+        "to": "folder.ico"
+      }
+    ]
+  },
+  "dependencies": {
+    "@ghostery/adblocker-electron": "^2.18.2",
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "electron": "^40.8.0",
+    "electron-builder": "^26.15.3"
+  }
 }

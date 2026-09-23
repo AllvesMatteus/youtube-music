@@ -2,43 +2,387 @@ const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-function getIconDataUrl(name) {
+function setupTopBar() {
+  if (document.getElementById('ytmd-titlebar')) return;
+
+  var appIconBase64 = '';
   try {
-    const iconPath = path.join(__dirname, '../../../assets/icons', `${name}.png`);
-    if (fs.existsSync(iconPath)) return `data:image/png;base64,${fs.readFileSync(iconPath).toString('base64')}`;
-  } catch (error) {}
-  return '';
+    var iconFile = path.join(__dirname, '../../../assets/icon.png');
+    if (fs.existsSync(iconFile)) {
+      appIconBase64 = 'data:image/png;base64,' + fs.readFileSync(iconFile).toString('base64');
+    }
+  } catch (_) {}
+
+  // 1. Zona de gatilho invisível no topo da tela (faixa de 6px)
+  var trigger = document.createElement('div');
+  trigger.id = 'ytmd-titlebar-trigger';
+  document.documentElement.appendChild(trigger);
+
+  // 2. Barra de Título (36px, padrão Windows dark #202020, arrastável)
+  var titlebar = document.createElement('div');
+  titlebar.id = 'ytmd-titlebar';
+  titlebar.className = 'ytmd-titlebar';
+
+  // Lado Esquerdo: Ícone + Título Dinâmico
+  var left = document.createElement('div');
+  left.className = 'ytmd-titlebar-left';
+
+  if (appIconBase64) {
+    var iconImg = document.createElement('img');
+    iconImg.className = 'ytmd-titlebar-icon';
+    iconImg.src = appIconBase64;
+    iconImg.alt = 'YouTube Music';
+    left.appendChild(iconImg);
+  }
+
+  var titleSpan = document.createElement('span');
+  titleSpan.id = 'ytmd-title-text';
+  titleSpan.className = 'ytmd-title-text';
+  titleSpan.textContent = 'YouTube Music';
+  left.appendChild(titleSpan);
+
+  titlebar.appendChild(left);
+
+  // Lado Direito: Botão de Configurações e Controles Nativos do Windows (Minimizar, Maximizar, Fechar)
+  var right = document.createElement('div');
+  right.className = 'ytmd-titlebar-right';
+
+  // Botão Configurações (46x36px, Segoe Fluent Gear \uE713)
+  var settingsBtn = document.createElement('button');
+  settingsBtn.id = 'ytmd-btn-settings';
+  settingsBtn.className = 'ytmd-titlebar-btn ytmd-btn-settings';
+  settingsBtn.title = 'Configurações';
+  settingsBtn.setAttribute('tabindex', '-1');
+  settingsBtn.textContent = '\uE713';
+  settingsBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    ipcRenderer.invoke('settings:open-window');
+  });
+  right.appendChild(settingsBtn);
+
+  // Botão Minimizar (46x36px, Segoe Fluent ChromeMinimize \uE921)
+  var minBtn = document.createElement('button');
+  minBtn.id = 'ytmd-btn-minimize';
+  minBtn.className = 'ytmd-titlebar-btn';
+  minBtn.title = 'Minimizar';
+  minBtn.setAttribute('tabindex', '-1');
+  minBtn.textContent = '\uE921';
+  minBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    ipcRenderer.invoke('window:minimize');
+  });
+  right.appendChild(minBtn);
+
+  // Botão Maximizar / Restaurar (46x36px, Segoe Fluent ChromeMaximize \uE922 / ChromeRestore \uE923)
+  var maxBtn = document.createElement('button');
+  maxBtn.id = 'ytmd-btn-maximize';
+  maxBtn.className = 'ytmd-titlebar-btn';
+  maxBtn.title = 'Maximizar';
+  maxBtn.setAttribute('tabindex', '-1');
+  maxBtn.textContent = '\uE922';
+  maxBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    ipcRenderer.invoke('window:maximize');
+  });
+  right.appendChild(maxBtn);
+
+  // Botão Fechar (46x36px, Segoe Fluent ChromeClose \uE8BB, hover vermelho nativo do Windows)
+  var closeBtn = document.createElement('button');
+  closeBtn.id = 'ytmd-btn-close';
+  closeBtn.className = 'ytmd-titlebar-btn ytmd-btn-close';
+  closeBtn.title = 'Fechar';
+  closeBtn.setAttribute('tabindex', '-1');
+  closeBtn.textContent = '\uE8BB';
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    ipcRenderer.invoke('window:close');
+  });
+  right.appendChild(closeBtn);
+
+  titlebar.appendChild(right);
+
+  // Injetar estilos limpos:
+  // - html, body com overflow hidden para eliminar a barra de rolagem raiz que passava por cima do botão Fechar
+  // - ytmusic-app-layout como container de rolagem interno com barra moderna, transparente e sem setas
+  var style = document.createElement('style');
+  style.id = 'ytmd-titlebar-styles';
+  style.appendChild(document.createTextNode(
+    'html, body {' +
+      'overflow: hidden !important;' +
+      'width: 100vw !important;' +
+      'height: 100vh !important;' +
+      'margin: 0 !important;' +
+      'padding: 0 !important;' +
+    '}' +
+    'ytmusic-app-layout, #layout {' +
+      'height: 100vh !important;' +
+      'overflow-y: auto !important;' +
+      'overflow-x: hidden !important;' +
+    '}' +
+    '::-webkit-scrollbar {' +
+      'width: 8px !important;' +
+      'height: 8px !important;' +
+      'background-color: transparent !important;' +
+    '}' +
+    '::-webkit-scrollbar-track {' +
+      'background-color: transparent !important;' +
+    '}' +
+    '::-webkit-scrollbar-thumb {' +
+      'background-color: rgba(255, 255, 255, 0.22) !important;' +
+      'border-radius: 4px !important;' +
+    '}' +
+    '::-webkit-scrollbar-thumb:hover {' +
+      'background-color: rgba(255, 255, 255, 0.45) !important;' +
+    '}' +
+    '::-webkit-scrollbar-button {' +
+      'display: none !important;' +
+      'width: 0 !important;' +
+      'height: 0 !important;' +
+    '}' +
+    '#ytmd-titlebar-trigger {' +
+      'position: fixed !important;' +
+      'top: 0 !important;' +
+      'left: 0 !important;' +
+      'width: 100vw !important;' +
+      'height: 6px !important;' +
+      'z-index: 2147483646 !important;' +
+      'background: transparent !important;' +
+    '}' +
+    '#ytmd-titlebar {' +
+      'position: fixed !important;' +
+      'top: 0 !important;' +
+      'left: 0 !important;' +
+      'width: 100vw !important;' +
+      'height: 36px !important;' +
+      'background-color: #202020 !important;' +
+      'border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;' +
+      'z-index: 2147483647 !important;' +
+      'display: flex !important;' +
+      'align-items: center !important;' +
+      'justify-content: space-between !important;' +
+      'padding: 0 !important;' +
+      'box-sizing: border-box !important;' +
+      'user-select: none !important;' +
+      '-webkit-app-region: drag !important;' +
+      'transform: translateY(-36px) !important;' +
+      'transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease !important;' +
+      'box-shadow: 0 4px 16px rgba(0, 0, 0, 0) !important;' +
+    '}' +
+    '#ytmd-titlebar.ytmd-visible {' +
+      'transform: translateY(0) !important;' +
+      'box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;' +
+    '}' +
+    '.ytmd-titlebar-left {' +
+      'display: flex !important;' +
+      'align-items: center !important;' +
+      'gap: 8px !important;' +
+      'padding-left: 12px !important;' +
+      'min-width: 0 !important;' +
+      'overflow: hidden !important;' +
+      'pointer-events: none !important;' +
+      '-webkit-app-region: drag !important;' +
+    '}' +
+    '.ytmd-titlebar-icon {' +
+      'width: 16px !important;' +
+      'height: 16px !important;' +
+      'object-fit: contain !important;' +
+      'flex-shrink: 0 !important;' +
+    '}' +
+    '.ytmd-title-text {' +
+      'color: #e0e0e0 !important;' +
+      'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;' +
+      'font-size: 13px !important;' +
+      'font-weight: 400 !important;' +
+      'white-space: nowrap !important;' +
+      'overflow: hidden !important;' +
+      'text-overflow: ellipsis !important;' +
+      'letter-spacing: 0.1px !important;' +
+    '}' +
+    '.ytmd-titlebar-right {' +
+      'display: flex !important;' +
+      'align-items: center !important;' +
+      'margin: 0 !important;' +
+      'padding: 0 !important;' +
+      'height: 36px !important;' +
+      '-webkit-app-region: no-drag !important;' +
+      'flex-shrink: 0 !important;' +
+    '}' +
+    '.ytmd-titlebar-btn {' +
+      'width: 46px !important;' +
+      'height: 36px !important;' +
+      'background: transparent !important;' +
+      'border: none !important;' +
+      'border-radius: 0 !important;' +
+      'color: #ffffff !important;' +
+      'display: inline-flex !important;' +
+      'align-items: center !important;' +
+      'justify-content: center !important;' +
+      'cursor: pointer !important;' +
+      'padding: 0 !important;' +
+      'margin: 0 !important;' +
+      'outline: none !important;' +
+      '-webkit-app-region: no-drag !important;' +
+      'font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets", sans-serif !important;' +
+      'font-size: 10px !important;' +
+      'line-height: 1 !important;' +
+      'user-select: none !important;' +
+      'transition: background-color 0.1s ease, color 0.1s ease !important;' +
+    '}' +
+    '.ytmd-btn-settings {' +
+      'font-size: 13px !important;' +
+    '}' +
+    '.ytmd-titlebar-btn:hover {' +
+      'background-color: rgba(255, 255, 255, 0.1) !important;' +
+      'color: #ffffff !important;' +
+    '}' +
+    '.ytmd-titlebar-btn:active {' +
+      'background-color: rgba(255, 255, 255, 0.18) !important;' +
+    '}' +
+    '.ytmd-btn-close:hover {' +
+      'background-color: #e81123 !important;' +
+      'color: #ffffff !important;' +
+    '}' +
+    '.ytmd-btn-close:active {' +
+      'background-color: #bf0f1d !important;' +
+      'color: #ffffff !important;' +
+    '}'
+  ));
+
+  document.head.appendChild(style);
+  document.documentElement.appendChild(titlebar);
+
+  // Duplo clique na área de arrastar para Maximizar / Restaurar
+  titlebar.addEventListener('dblclick', function(e) {
+    if (e.target && e.target.closest('.ytmd-titlebar-btn')) return;
+    ipcRenderer.invoke('window:maximize');
+  });
+
+  // Atualização do ícone de Maximizar/Restaurar com glifos nativos do Windows 11
+  var setMaximizeIcon = function(isMaximized) {
+    var btn = document.getElementById('ytmd-btn-maximize');
+    if (!btn) return;
+    btn.textContent = isMaximized ? '\uE923' : '\uE922';
+    btn.title = isMaximized ? 'Restaurar' : 'Maximizar';
+  };
+
+  var checkMaximized = function() {
+    ipcRenderer.invoke('window:is-maximized').then(function(isMax) {
+      setMaximizeIcon(Boolean(isMax));
+    }).catch(function() {});
+  };
+
+  checkMaximized();
+  setTimeout(checkMaximized, 1000);
+
+  ipcRenderer.on('window-maximized-state', function(event, isMax) {
+    setMaximizeIcon(Boolean(isMax));
+  });
+
+  window.addEventListener('resize', checkMaximized);
+
+  // Mecanismo de Auto-Hide estilo Navegador Zen (Sobreposição suave)
+  var hideTimeout = null;
+
+  var showBar = function() {
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+    checkMaximized();
+    titlebar.classList.add('ytmd-visible');
+  };
+
+  var scheduleHide = function(delay) {
+    if (hideTimeout) clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(function() {
+      titlebar.classList.remove('ytmd-visible');
+      hideTimeout = null;
+    }, delay || 1000);
+  };
+
+  trigger.addEventListener('mouseenter', showBar);
+  titlebar.addEventListener('mouseenter', showBar);
+  titlebar.addEventListener('mouseleave', function() {
+    scheduleHide(1000);
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (e.clientY <= 6) {
+      showBar();
+    }
+  });
+
+  // Mostra brevemente ao carregar para o usuário saber que existe, e depois recolhe
+  showBar();
+  scheduleHide(2500);
+
+  // Atualização dinâmica do Título da Música (apenas título e autor, sem curtidas)
+  var updateTitle = function(title, artist) {
+    if (!titleSpan) return;
+    if (title && title.trim()) {
+      var t = title.trim();
+      var a = (artist || '').split('•')[0].split('·')[0].split('|')[0].trim();
+      titleSpan.textContent = a ? (t + ' • ' + a) : t;
+    } else {
+      var docTitle = (document.title || '').replace(/ - YouTube Music/i, '').replace(/ • YouTube Music/i, '').trim();
+      titleSpan.textContent = docTitle || 'YouTube Music';
+    }
+  };
+
+  // Observador de faixa em reprodução no YouTube Music
+  var observeTrack = function() {
+    var playerBar = document.querySelector('ytmusic-player-bar');
+    if (!playerBar) return;
+
+    var readPlayer = function() {
+      var tEl = playerBar.querySelector('.title') || playerBar.querySelector('.ytmusic-player-bar.title');
+      var aEl = playerBar.querySelector('.byline') || playerBar.querySelector('.ytmusic-player-bar.byline');
+      var t = tEl ? tEl.textContent.trim() : '';
+      var a = '';
+      if (aEl) {
+        var firstLink = aEl.querySelector('a');
+        if (firstLink && firstLink.textContent.trim()) {
+          a = firstLink.textContent.trim();
+        } else {
+          var raw = aEl.textContent.trim();
+          var parts = raw.split(/•|·|\|/);
+          a = (parts[0] || '').trim();
+        }
+      }
+      updateTitle(t, a);
+    };
+
+    var observer = new MutationObserver(readPlayer);
+    observer.observe(playerBar, { childList: true, subtree: true, characterData: true });
+    readPlayer();
+  };
+
+  var playerPoll = setInterval(function() {
+    if (document.querySelector('ytmusic-player-bar')) {
+      clearInterval(playerPoll);
+      observeTrack();
+    }
+  }, 1000);
+
+  ipcRenderer.on('track-changed', function(event, data) {
+    if (data) updateTitle(data.title, data.artist);
+  });
+
+  var titleTag = document.querySelector('title');
+  if (titleTag) {
+    new MutationObserver(function() {
+      var playerBar = document.querySelector('ytmusic-player-bar');
+      if (!playerBar) updateTitle('', '');
+    }).observe(titleTag, { childList: true, characterData: true, subtree: true });
+  }
+
+  // Suporte a tela cheia
+  var handleFullscreen = function() {
+    var isFs = !!document.fullscreenElement;
+    document.documentElement.classList.toggle('ytmd-fullscreen', isFs);
+    if (titlebar) titlebar.style.display = isFs ? 'none' : 'flex';
+  };
+  document.addEventListener('fullscreenchange', handleFullscreen);
 }
 
-function setupTopBar() {
-  const icons = Object.fromEntries(['shuffle', 'previous', 'rewind', 'play', 'pause', 'fast-forward', 'next', 'repeat', 'like', 'volume', 'mute', 'avatar', 'exit'].map(name => [name.replace('-', ''), getIconDataUrl(name)]));
-  const bar = document.createElement('div');
-  bar.id = 'ytm-custom-topbar';
-  bar.innerHTML = `<div class="topbar-container"><div class="topbar-controls"><button class="topbar-btn" id="btn-shuffle" title="Aleatório"><img src="${icons.shuffle}" alt="Aleatório"></button><button class="topbar-btn" id="btn-previous" title="Música Anterior"><img src="${icons.previous}" alt="Anterior"></button><button class="topbar-btn" id="btn-rewind" title="Voltar 10s"><img src="${icons.rewind}" alt="Voltar 10s"></button><button class="topbar-btn play-btn" id="btn-play-pause" title="Play / Pause"><img id="img-play-pause" src="${icons.play}" alt="Play/Pause"></button><button class="topbar-btn" id="btn-fastforward" title="Avançar 10s"><img src="${icons.fastforward}" alt="Avançar 10s"></button><button class="topbar-btn" id="btn-next" title="Próxima Música"><img src="${icons.next}" alt="Próxima"></button><button class="topbar-btn" id="btn-repeat" title="Repetir"><img src="${icons.repeat}" alt="Repetir"></button><button class="topbar-btn" id="btn-like" title="Curtir"><img src="${icons.like}" alt="Curtir"></button><button class="topbar-btn" id="btn-mute" title="Volume / Mudo"><img id="img-mute" src="${icons.volume}" alt="Volume"></button></div><div class="topbar-actions"><button class="topbar-btn user-btn" id="btn-user-switch" title="Mudar de Conta"><img src="${icons.avatar}" alt="Usuário"><span id="active-user-name" class="user-label">Contas</span></button><button class="topbar-btn exit-btn" id="btn-app-exit" title="Fechar Aplicativo"><img src="${icons.exit}" alt="Fechar"></button></div></div><div id="ytm-account-modal" class="account-modal hidden"><div class="modal-header"><h3>Alternar Conta</h3><span class="modal-close" id="btn-close-modal">&times;</span></div><div id="accounts-list" class="accounts-list"></div><div class="modal-footer"><button id="btn-add-account" class="btn-add-account">Adicionar Nova Conta</button></div></div>`;
-  const style = document.createElement('style');
-  style.textContent = `#ytm-custom-topbar{position:fixed;top:0;left:0;right:0;height:48px;background:rgba(18,18,18,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);z-index:999999;display:flex;align-items:center;padding:0 16px;box-sizing:border-box;-webkit-app-region:drag}.topbar-container{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}.topbar-controls,.topbar-actions{display:flex;align-items:center;gap:8px;-webkit-app-region:no-drag}.topbar-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}.topbar-btn img{width:16px;height:16px;object-fit:contain;pointer-events:none}.topbar-btn:hover{background:rgba(255,255,255,.15)}.play-btn{background:rgba(255,0,0,.2)}.user-btn{width:auto;padding:0 12px;gap:8px}.user-label{color:#fff;font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.exit-btn{background:rgba(255,59,48,.15)}.exit-btn:hover{background:#ff3b30}.account-modal{position:absolute;top:54px;right:16px;width:300px;background:#1e1e1e;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:16px;color:#fff;z-index:1000000;-webkit-app-region:no-drag}.account-modal.hidden{display:none}.modal-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;margin-bottom:12px}.modal-header h3{font-size:14px;margin:0}.modal-close{cursor:pointer;font-size:20px;color:#888}.accounts-list{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;margin-bottom:14px}.account-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);cursor:pointer}.account-item.active{background:rgba(255,0,0,.15);border-color:rgba(255,0,0,.5)}.account-info{display:flex;flex-direction:column;gap:2px;overflow:hidden}.account-name{font-size:13px;color:#fff}.account-email{font-size:11px;color:#888}.active-badge{font-size:11px;color:#ff4444;font-weight:600}.btn-add-account{width:100%;padding:10px;background:#f00;color:#fff;border:0;border-radius:8px;cursor:pointer} `;
-  document.head.appendChild(style);
-  document.body.prepend(bar);
-  const action = (id, fn) => document.getElementById(id).addEventListener('click', fn);
-  action('btn-play-pause', () => { const button = document.querySelector('#play-pause-button,.play-pause-button'); if (button) button.click(); else { const video = document.querySelector('video'); if (video) video.paused ? video.play() : video.pause(); } });
-  action('btn-next', () => document.querySelector('.next-button,tp-yt-paper-icon-button.next-button')?.click());
-  action('btn-previous', () => document.querySelector('.previous-button,tp-yt-paper-icon-button.previous-button')?.click());
-  action('btn-rewind', () => { const video = document.querySelector('video'); if (video) video.currentTime = Math.max(0, video.currentTime - 10); });
-  action('btn-fastforward', () => { const video = document.querySelector('video'); if (video) video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 10); });
-  action('btn-shuffle', () => document.querySelector('ytmusic-player-bar .shuffle,.ytmusic-player-bar.shuffle,tp-yt-paper-icon-button.shuffle')?.click());
-  action('btn-repeat', () => document.querySelector('ytmusic-player-bar .repeat,.ytmusic-player-bar.repeat,tp-yt-paper-icon-button.repeat')?.click());
-  action('btn-like', () => document.querySelector('ytmusic-player-bar ytmusic-like-button-renderer #button[aria-label*="Gostei"],ytmusic-player-bar ytmusic-like-button-renderer tp-yt-paper-icon-button.like')?.click());
-  action('btn-mute', () => { const video = document.querySelector('video'); if (video) { video.muted = !video.muted; document.getElementById('img-mute').src = video.muted ? icons.mute : icons.volume; } });
-  action('btn-app-exit', () => ipcRenderer.send('app-exit'));
-  const modal = document.getElementById('ytm-account-modal');
-  const renderAccounts = async () => { const { accounts, activeAccountId } = await ipcRenderer.invoke('get-accounts'); document.getElementById('accounts-list').innerHTML = accounts.map(acc => `<div class="account-item ${acc.id === activeAccountId ? 'active' : ''}" data-id="${acc.id}"><div class="account-info"><span class="account-name">${acc.name}</span>${acc.email ? `<span class="account-email">${acc.email}</span>` : ''}</div>${acc.id === activeAccountId ? '<span class="active-badge">Ativa</span>' : ''}</div>`).join(''); document.querySelectorAll('.account-item').forEach(item => item.onclick = async () => { if (item.dataset.id !== activeAccountId) await ipcRenderer.invoke('switch-account', item.dataset.id); modal.classList.add('hidden'); }); document.getElementById('active-user-name').textContent = accounts.find(acc => acc.id === activeAccountId)?.name || 'Contas'; };
-  action('btn-user-switch', () => { modal.classList.toggle('hidden'); if (!modal.classList.contains('hidden')) renderAccounts(); });
-  ipcRenderer.on('open-account-manager', () => {
-    modal.classList.remove('hidden');
-    renderAccounts();
-  });
-  action('btn-close-modal', () => modal.classList.add('hidden'));
-  action('btn-add-account', async () => { const name = prompt('Nome da nova conta:', 'Conta 2'); if (name) await ipcRenderer.invoke('add-account', name); });
-  renderAccounts();
-}
 module.exports = { setupTopBar };

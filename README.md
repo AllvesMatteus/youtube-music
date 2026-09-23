@@ -1,72 +1,59 @@
 # 🎵 YouTube Music Desktop
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square)](https://github.com/AllvesMatteus/youtube-music-desktop/releases)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-blue.svg?style=flat-square)](https://www.microsoft.com/windows)
+[![Version](https://img.shields.io/badge/version-1.1.0-red.svg?style=flat-square)](https://github.com/AllvesMatteus/youtube-music/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-blue.svg?style=flat-square)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D16.x-green.svg?style=flat-square)](https://nodejs.org)
-[![Electron](https://img.shields.io/badge/electron-%3E%3D40.8.0-blue.svg?style=flat-square)](https://www.electronjs.org)
+[![Electron](https://img.shields.io/badge/electron-40.10.6-blue.svg?style=flat-square)](https://www.electronjs.org)
 
-> 🚀 Uma aplicação Electron elegante, modular e escalável para **YouTube Music** no desktop com recursos avançados e arquitetura otimizada para performance.
+> 🚀 Um cliente Electron desktop moderno, elegante e de alta performance para o **YouTube Music**, com bloqueio de anúncios nativo, mini player flutuante, Discord Rich Presence, notificações do Windows, temas visuais e atualizações automáticas contínuas.
 
 ---
 
 ## ✨ Características Principais
 
 | Recurso | Descrição |
-|---------|-----------|
-| 🎵 **Player Nativo** | Interface completa do YouTube Music integrada no desktop |
-| 🔐 **Multi-Contas** | Gerencie múltiplas contas YouTube com perfis isolados |
-| 🛡️ **Bloqueio de Anúncios** | Bloqueador integrado usando Ghostery/EasyList |
-| ⌨️ **Atalhos Globais** | Controle reprodução com teclas de mídia do Windows |
-| 🖼️ **Minimizar para Tray** | Acesso rápido na bandeja do sistema |
-| 💾 **Persistência** | Lembra tamanho, posição e sessão da janela |
-| 🤖 **Anti-Detecção** | Mascaramento inteligente de automação |
-| ⚡ **Otimizado** | Arquitetura modular, escalável e performática |
+|---|---|
+| 🎵 **Player Nativo Otimizado** | Interface oficial do YouTube Music com baixa latência e consumo reduzido de RAM |
+| 🪟 **Mini Player Flutuante** | Mini-janela compacta estilo Zen com controles completos, capa e sincronização em tempo real |
+| 🎮 **Discord Rich Presence** | Exibe no seu perfil do Discord a música, artista, capa do álbum, tempo decorrido e botão de reprodução |
+| 🔔 **Notificações Nativas** | Avisos no canto da tela do Windows na troca de faixa sem interromper seus jogos ou trabalho |
+| ⌨️ **Teclas de Atalho Globais** | Gravador interativo nas Configurações e suporte nativo a teclados mecânicos/gaming |
+| 🖤 **Aparência & Temas** | Seletor com tema Preto Puro (OLED / AMOLED) de alto contraste |
+| 🛡️ **Bloqueio de Anúncios** | Motor integrado Ghostery/EasyList para reprodução contínua sem interrupções |
+| 🔄 **Auto-Atualização Contínua** | Verificação automática e atualização em segundo plano via GitHub Releases |
+| 🖼️ **Bandeja do Sistema (Tray)** | Fechamento em segundo plano e controles rápidos ao clicar no ícone da barra de tarefas |
 
 ---
 
 ## 📋 Pré-requisitos
 
-- **Node.js** `>= 16.x` ([Download](https://nodejs.org))
-- **npm** `>= 8.x` (incluso com Node.js)
-- **Windows 10/11** (x64)
-- **Git** (opcional, para desenvolvimento)
+- **Windows 10 / 11** (64-bit)
+- **Node.js** `>= 18.x` (para desenvolvimento)
 
 ---
 
-## 🚀 Guia de Instalação
+## 🚀 Instalação e Execução
 
-### Para Usuários Finais
-
-1. **Baixe o instalador** na página [Releases](https://github.com/AllvesMatteus/youtube-music-desktop/releases)
-2. **Execute** `YouTube Music Setup 1.0.0.exe`
-3. **Siga** as instruções do instalador
-4. **Inicie** a aplicação no menu iniciar ou desktop
+### Para Usuários
+1. Baixe o instalador mais recente na página de [Releases](https://github.com/AllvesMatteus/youtube-music/releases).
+2. Execute o instalador `YouTube Music Setup 1.1.0.exe`.
+3. Pronto! O app se atualizará automaticamente conforme novas versões forem lançadas.
 
 ### Para Desenvolvedores
-
-#### 1. Clonar Repositório
 ```bash
-git clone https://github.com/AllvesMatteus/youtube-music-desktop.git
-cd youtube-music-desktop
-```
+# 1. Clonar o repositório
+git clone https://github.com/AllvesMatteus/youtube-music.git
+cd youtube-music
 
-#### 2. Instalar Dependências
-```bash
+# 2. Instalar dependências
 npm install
-```
 
-#### 3. Executar em Desenvolvimento
-```bash
-npm run dev
-```
+# 3. Rodar em ambiente de desenvolvimento
+npm start
 
-#### 4. Build para Produção
-```bash
+# 4. Gerar instalador para Windows
 npm run build
 ```
-
-O instalador será gerado em `dist/YouTube Music Setup 1.0.0.exe`
 
 ---
 
@@ -75,142 +62,43 @@ O instalador será gerado em `dist/YouTube Music Setup 1.0.0.exe`
 ```
 .
 ├── src/
-│   ├── main/                      # Main Process (Backend)
+│   ├── main/                      # Processo Principal (Electron / Node.js)
 │   │   ├── index.js               # Entrypoint & ciclo de vida
-│   │   ├── config/                # Configurações centralizadas
-│   │   ├── windows/               # Gerenciadores de janelas
+│   │   ├── config/appConfig.js    # Configurações centralizadas
+│   │   ├── windows/               # Gerenciadores de janelas (Main, Settings, MiniPlayer, Splash)
 │   │   ├── services/              # Serviços de domínio
 │   │   │   ├── authService.js     # Autenticação
-│   │   │   ├── accountService.js  # Multi-contas
 │   │   │   ├── adblockService.js  # Bloqueio de anúncios
-│   │   │   ├── mediaKeysService.js# Atalhos globais
-│   │   │   ├── trayService.js     # Bandeja do sistema
-│   │   │   └── windowStateService.js # Persistência
-│   │   └── ipc/                   # Comunicação IPC
-│   ├── preload/                   # Preload Scripts (Bridge segura)
+│   │   │   ├── discordService.js  # Discord Rich Presence via IPC nativo
+│   │   │   ├── notificationService.js # Notificações desktop do Windows
+│   │   │   ├── themeService.js    # Injeção de temas visuais (OLED Black)
+│   │   │   ├── mediaKeysService.js# Atalhos globais e suporte a teclados gaming
+│   │   │   ├── settingsService.js # Persistência de configurações em JSON
+│   │   │   ├── updateService.js   # Atualizações automáticas contínuas
+│   │   │   └── trayService.js     # Bandeja do sistema (Tray)
+│   │   └── ipc/                   # Canais de comunicação IPC
+│   ├── preload/                   # Preload Scripts (Bridge segura com a web)
 │   │   └── modules/               # Módulos de injeção
 │   │       ├── antiDetection.js   # Mascaramento de automação
-│   │       ├── adSkipper.js       # Auto-skip de anúncios
-│   │       ├── playerController.js# Controle do player
-│   │       ├── trackObserver.js   # Observação de tracks
-│   │       └── topBar.js          # Barra superior
-│   ├── renderer/                  # Renderer Process
-│   │   └── splash/                # Splash screen
-│   └── shared/                    # Código compartilhado
-├── assets/                        # Recursos estáticos
-│   ├── icons/                     # Ícones da aplicação
-│   └── folder.ico                 # Ícone de pasta para instalador
-├── scripts/                       # Scripts utilitários
-├── package.json                   # Metadados & dependências
-└── PROJETO.md                     # Documentação de arquitetura
-
+│   │       ├── playerController.js# Controle do player e captura de faixas
+│   │       └── topBar.js          # Barra de controles nativos do Windows
+│   └── renderer/                  # Interfaces de Renderização
+│       ├── mini-player/           # Interface do Mini Player
+│       └── splash/                # Interface da tela de splash
+└── assets/                        # Ícones e recursos visuais
 ```
 
 ---
 
-## 🏗️ Arquitetura
+## 📝 Versões
 
-A aplicação segue uma **arquitetura modular multi-processo**:
-
-```
-┌─────────────────────────────────────────┐
-│         Main Process (Node.js)          │
-├─────────────────────────────────────────┤
-│ • Gerenciamento de janelas              │
-│ • Serviços de negócio                   │
-│ • IPC bidirecional                      │
-│ • Atalhos globais                       │
-└──────────────┬──────────────────────────┘
-               │
-         ┌─────┴─────┐
-         │ Preload   │
-         │ Scripts   │
-         └─────┬─────┘
-               │
-┌──────────────┴──────────────┐
-│   Renderer Process          │
-│  (YouTube Music Web)        │
-└─────────────────────────────┘
-```
-
-Para mais detalhes, veja [PROJETO.md](PROJETO.md)
-
----
-
-## 📖 Como Usar
-
-### Atalhos Globais
-
-| Atalho | Ação |
-|--------|------|
-| `Media Play/Pause` | Play/Pausa |
-| `Media Next` | Próxima música |
-| `Media Previous` | Música anterior |
-| `Tray` | Minimizar/Restaurar |
-
-### Gerenciamento de Contas
-
-1. Clique no **ícone de usuário** na barra superior
-2. Selecione **Adicionar conta**
-3. Faça login com sua conta Google
-4. Use o **seletor de conta** para trocar entre perfis
-
-### Bloqueio de Anúncios
-
-- **Automático** - Ativado por padrão
-- **Configuração** - Menu > Preferências > Bloquear Anúncios
-
----
-
-## 🐛 Solução de Problemas
-
-### A aplicação não inicia
-- Verifique se o Windows 10+ está atualizado
-- Execute novamente o instalador como administrador
-- Verifique se há espaço em disco
-
-### Login não funciona
-- Limpe o cache: `%APPDATA%\YouTube Music\`
-- Desative VPN/Proxy temporariamente
-- Tente novamente com outra conta
-
-### Atalhos globais não funcionam
-- Verifique permissões no Windows
-- Desative aplicações que capturem teclas de mídia
-- Reinicie a aplicação
-
-### Anúncios não são bloqueados
-- Verifique conexão com internet
-- Atualize a aplicação para a versão mais recente
-- Limpe o cache do navegador
-
----
-
-## 🤝 Contribuição
-
-Contribuições são **bem-vindas**! 
-
-### Como contribuir
-
-1. **Fork** o repositório
-2. **Crie** uma branch (`git checkout -b feature/MinhaFeature`)
-3. **Commit** suas mudanças (`git commit -m 'Add: MinhaFeature'`)
-4. **Push** para a branch (`git push origin feature/MinhaFeature`)
-5. **Abra** um Pull Request
-
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes detalhadas.
-
-### Áreas para Contribuição
-
-- 🐛 Correção de bugs
-- ✨ Novas features
-- 📚 Documentação
-- 🎨 UI/UX melhorias
-- 🧪 Testes
-
----
-
-## 📝 Changelog
+### v1.1.0 (2026-09-22)
+- ✅ Novo design de configurações estilo YouTube Music
+- ✅ Teclas de atalho globais customizáveis com gravação interativa
+- ✅ Correção definitiva de compatibilidade com teclas multimídia (teclados gaming)
+- ✅ Integração nativa com Discord Rich Presence
+- ✅ Notificações nativas do Windows na troca de faixa
+- ✅ Suporte a Temas Visuais (Preto Puro OLED / AMOLED)
 
 ### v1.0.0 (2026-08-31)
 - ✅ Aplicação base completa
@@ -220,16 +108,6 @@ Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes detalhadas.
 - ✅ Persistência de estado
 - ✅ System tray
 - ✅ Instalador NSIS
-
-Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo.
-
----
-
-## 📞 Suporte
-
-- 📧 **Email**: [adicionar email de contato]
-- 💬 **Issues**: [GitHub Issues](https://github.com/AllvesMatteus/youtube-music-desktop/issues)
-- 📖 **Documentação**: [PROJETO.md](PROJETO.md)
 
 ---
 
@@ -241,27 +119,6 @@ Este projeto é licenciado sob a **Licença MIT** - veja o arquivo [LICENSE](LIC
 
 ## ⚖️ Aviso Legal
 
-Este projeto é uma **aplicação não oficial** para YouTube Music. 
-
-- Não é afiliado, endorsado ou patrocinado pelo Google/YouTube
-- Use por sua conta e risco
-- Respeite os [Termos de Serviço](https://www.youtube.com/t/terms) do YouTube Music
-- O bloqueio de anúncios pode violar os ToS - use responsavelmente
-
----
-
-## 🙏 Créditos
-
-- [Electron](https://www.electronjs.org) - Framework
-- [@ghostery/adblocker-electron](https://github.com/ghostery/adblocker) - Bloqueador de anúncios
-- [Electron Builder](https://www.electron.build) - Build system
-
----
-
-<div align="center">
-
-Feito com ❤️ por [AllvesMatteus](https://github.com/AllvesMatteus)
-
-[⬆ Voltar ao Topo](#-youtube-music-desktop)
-
-</div>
+Este projeto é uma **aplicação não oficial** para YouTube Music.
+- Não é afiliado, endossado ou patrocinado pelo Google/YouTube.
+- Respeite os [Termos de Serviço](https://www.youtube.com/t/terms) do YouTube Music.

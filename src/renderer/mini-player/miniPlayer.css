@@ -1,4 +1,4 @@
-﻿* { box-sizing: border-box; }
+* { box-sizing: border-box; }
 
 html, body {
   margin: 0;
@@ -86,6 +86,12 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
   text-overflow: ellipsis;
   color: #f0f0f0;
   line-height: 1.2;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.track-title:hover {
+  color: #ffffff;
+  text-decoration: underline;
 }
 
 .track-artist {
@@ -96,6 +102,12 @@ button { border: 0; background: transparent; cursor: pointer; padding: 0; color:
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.2;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.track-artist:hover {
+  color: rgba(255,255,255,0.85);
+  text-decoration: underline;
 }
 
 .player-controls {

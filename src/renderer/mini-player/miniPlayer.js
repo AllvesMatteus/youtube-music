@@ -1,4 +1,4 @@
-﻿const api = window.miniPlayerAPI;
+const api = window.miniPlayerAPI;
 const $ = sel => document.querySelector(sel);
 const state = {
   currentTitle: '',
@@ -52,6 +52,7 @@ function setRepeatState(mode) {
 function setShuffleState(isShuffled) {
   state.isShuffled = isShuffled;
   const btn = $('#shuffle');
+  if (!btn) return;
   btn.classList.toggle('active', isShuffled);
   btn.style.opacity = isShuffled ? '1' : '0.55';
 }
@@ -135,13 +136,23 @@ $('#repeat').onclick = () => {
   api.command('repeat');
 };
 
-$('#shuffle').onclick = () => {
-  setShuffleState(!state.isShuffled);
-  api.command('shuffle');
-};
+const shuffleBtn = $('#shuffle');
+if (shuffleBtn) {
+  shuffleBtn.onclick = () => {
+    setShuffleState(!state.isShuffled);
+    api.command('shuffle');
+  };
+}
 
-$('#account-button').onclick = () => api.openAccounts();
-$('#close-button').onclick   = () => api.close();
+const openWindowBtn = $('#open-window-button') || $('#account-button');
+if (openWindowBtn) {
+  openWindowBtn.onclick = () => api.openMainWindow();
+}
+$('#close-button').onclick = () => api.close();
+
+// Clicar no título ou artista da música abre a janela principal
+$('#title').onclick  = () => api.openMainWindow();
+$('#artist').onclick = () => api.openMainWindow();
 
 $('#progress').oninput = e => {
   const val = Number(e.target.value);
@@ -215,4 +226,21 @@ setShuffleState(false);
 setLikeState(false);
 api.onTrackState(updateTrack);
 loadSettings();
+
+// Sincronização em tempo real das configurações com a Janela Principal
+if (api.onSettingChanged) {
+  api.onSettingChanged(({ key, value }) => {
+    if (key === 'startWithWindows') {
+      const el = $('#start-with-windows');
+      if (el) el.checked = Boolean(value);
+    } else if (key === 'closeBehavior') {
+      const el = $('#close-to-tray');
+      if (el) el.checked = value !== 'exit';
+    } else if (key === 'alwaysOnTop') {
+      const el = $('#always-on-top');
+      if (el) el.checked = Boolean(value);
+    }
+  });
+}
+
 
