@@ -38,9 +38,9 @@ scratch/
 .sublime-project
 .sublime-workspace
 
-# Electron
-release/
-out/
+# Electron build output
+/release/
+/out/
 
 # Cache
 .cache/
