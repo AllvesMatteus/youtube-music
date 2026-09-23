@@ -24,14 +24,35 @@ function getIPCPath(id) {
 class IPCClient extends EventEmitter {
   constructor() {
     super();
+    // Previne que qualquer evento 'error' não tratado cause Uncaught Exception no processo principal
+    this.on('error', () => {});
+    this.socket = null;
     this.createSocket();
   }
 
   createSocket() {
+    if (this.socket) {
+      try {
+        this.socket.removeAllListeners();
+        this.socket.destroy();
+      } catch (_) {}
+    }
+
     this.socket = new Socket();
-    this.socket.on('connect', () => this.emit('connect'));
-    this.socket.on('close', (hadError) => this.emit('close', hadError));
-    this.socket.on('error', (err) => this.emit('error', err));
+    
+    // Tratadores de eventos silenciosos
+    this.socket.on('error', (err) => {
+      this.emit('error', err);
+    });
+
+    this.socket.on('connect', () => {
+      this.emit('connect');
+    });
+
+    this.socket.on('close', (hadError) => {
+      this.emit('close', hadError);
+    });
+
     this.socket.on('data', (buffer) => {
       try {
         const op = buffer.readInt32LE(0);
@@ -43,13 +64,14 @@ class IPCClient extends EventEmitter {
   }
 
   connect(ipcPath) {
-    if (this.socket.destroyed) {
-      this.createSocket();
-    }
-    this.socket.connect(ipcPath);
+    this.createSocket();
+    try {
+      this.socket.connect(ipcPath);
+    } catch (_) {}
   }
 
   send(data, op = OPCode.FRAME) {
+    if (!this.socket || this.socket.destroyed) return;
     try {
       const json = JSON.stringify(data);
       const length = Buffer.byteLength(json);
@@ -62,9 +84,12 @@ class IPCClient extends EventEmitter {
   }
 
   destroy() {
-    try {
-      this.socket.destroy();
-    } catch (_) {}
+    if (this.socket) {
+      try {
+        this.socket.removeAllListeners();
+        this.socket.destroy();
+      } catch (_) {}
+    }
   }
 }
 
@@ -76,6 +101,20 @@ class DiscordService {
     this.reconnectTimer = null;
     this.lastState = null;
     this.updateDebounce = null;
+
+    // Registra listeners de forma permanente e sem duplicacoes
+    this.ipc.on('close', () => {
+      if (this.connected) {
+        this.connected = false;
+        this.scheduleReconnect();
+      }
+    });
+
+    this.ipc.on('data', ({ op, json }) => {
+      if (op === OPCode.PING) {
+        this.ipc.send(json, OPCode.PONG);
+      }
+    });
   }
 
   init() {
@@ -86,28 +125,36 @@ class DiscordService {
 
   connect() {
     if (this.connected || this.connecting) return;
+    if (settingsService.get('discordPresence') === false) return;
+
     this.connecting = true;
 
     const tryConnect = async () => {
       for (let id = 0; id < 10; id++) {
+        if (settingsService.get('discordPresence') === false) break;
+
         const path = getIPCPath(id);
         const success = await new Promise((resolve) => {
-          const onConnect = () => {
+          let doneOnce = false;
+          const finish = (res) => {
+            if (doneOnce) return;
+            doneOnce = true;
             cleanup();
-            resolve(true);
+            resolve(res);
           };
-          const onError = () => {
-            cleanup();
-            resolve(false);
-          };
-          const onClose = () => {
-            cleanup();
-            resolve(false);
-          };
+
+          const onConnect = () => finish(true);
+          const onError = () => finish(false);
+          const onClose = () => finish(false);
+
           const cleanup = () => {
-            this.ipc.socket.removeListener('connect', onConnect);
-            this.ipc.socket.removeListener('error', onError);
-            this.ipc.socket.removeListener('close', onClose);
+            try {
+              if (this.ipc.socket) {
+                this.ipc.socket.removeListener('connect', onConnect);
+                this.ipc.socket.removeListener('error', onError);
+                this.ipc.socket.removeListener('close', onClose);
+              }
+            } catch (_) {}
           };
 
           this.ipc.socket.once('connect', onConnect);
@@ -117,8 +164,7 @@ class DiscordService {
           try {
             this.ipc.connect(path);
           } catch (_) {
-            cleanup();
-            resolve(false);
+            finish(false);
           }
         });
 
@@ -131,17 +177,6 @@ class DiscordService {
             client_id: DISCORD_CLIENT_ID
           }, OPCode.HANDSHAKE);
 
-          this.ipc.on('close', () => {
-            this.connected = false;
-            this.scheduleReconnect();
-          });
-
-          this.ipc.on('data', ({ op, json }) => {
-            if (op === OPCode.PING) {
-              this.ipc.send(json, OPCode.PONG);
-            }
-          });
-
           if (this.lastState) {
             this.updateActivity(this.lastState);
           }
@@ -149,11 +184,16 @@ class DiscordService {
         }
       }
 
+      this.connected = false;
       this.connecting = false;
       this.scheduleReconnect();
     };
 
-    tryConnect();
+    tryConnect().catch(() => {
+      this.connected = false;
+      this.connecting = false;
+      this.scheduleReconnect();
+    });
   }
 
   scheduleReconnect() {

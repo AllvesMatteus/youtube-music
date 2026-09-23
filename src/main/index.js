@@ -9,6 +9,14 @@ const settingsService = require('./services/settingsService');
 const updateService = require('./services/updateService');
 const discordService = require('./services/discordService');
 
+// Tratamento global para conexões de named pipes (evita pop-up de erro se o Discord for fechado)
+process.on('uncaughtException', (err) => {
+  if (err && (err.code === 'ENOENT' || err.message?.includes('discord-ipc') || err.message?.includes('pipe'))) {
+    return;
+  }
+  console.error('[Main Process] Erro não tratado:', err);
+});
+
 // Otimizações de Memória RAM e Chromium Flags
 app.commandLine.appendSwitch('disable-blink-features', 'AutomationControlled');
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,CrossOriginOpenerPolicy');
