@@ -13,7 +13,7 @@
     "build": "electron-builder --win",
     "build:dev": "electron-builder --win --dir",
     "release": "electron-builder --win --publish always",
-    "publish:auto": "powershell -ExecutionPolicy Bypass -File ./tools/publish/publish.ps1"
+    "publish:auto": "powershell -ExecutionPolicy Bypass -File ./publish/publish.ps1"
   },
   "build": {
     "appId": "com.allvesmatteus.ytmusic",
