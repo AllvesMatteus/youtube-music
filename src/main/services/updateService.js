@@ -20,6 +20,7 @@ class UpdateService {
     // Configurações do autoUpdater
     autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.allowDowngrade = false;
 
     // Configura logger básico
     autoUpdater.logger = {
@@ -30,6 +31,7 @@ class UpdateService {
 
     autoUpdater.on('checking-for-update', () => {
       this.status = 'checking';
+      this.progress = 0;
       this.errorMessage = null;
       this.notifyState();
       diagnosticService.logEvent('UPDATE_CHECKING', 'Verificando atualizações no repositório...');
@@ -38,6 +40,7 @@ class UpdateService {
     autoUpdater.on('update-available', (info) => {
       this.status = 'available';
       this.updateInfo = info;
+      this.progress = 0;
       this.notifyState();
       diagnosticService.logEvent('UPDATE_AVAILABLE', `Nova versão encontrada: v${info.version}`);
     });
@@ -103,6 +106,7 @@ class UpdateService {
 
     try {
       this.status = 'checking';
+      this.progress = 0;
       this.notifyState();
       const result = await autoUpdater.checkForUpdates();
       return result;
@@ -134,3 +138,4 @@ class UpdateService {
 }
 
 module.exports = new UpdateService();
+

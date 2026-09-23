@@ -306,6 +306,30 @@ function createSettingsWindow(parentWindow) {
       font-weight: 600;
     }
     .pill-primary:hover { background: var(--yt-red-hover); }
+    .pill-green {
+      background: #2ba640;
+      border-color: #2ba640;
+      color: #fff;
+      font-weight: 600;
+    }
+    .pill-green:hover { background: #249136; }
+    .pill-ghost {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.12);
+      color: var(--text-secondary);
+    }
+    .pill-ghost:hover { background: rgba(255,255,255,0.10); color: var(--text-primary); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .update-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      flex-shrink: 0;
+    }
 
     /* Gravador de Atalhos (Key Recorder) */
     .shortcut-recorder-wrap {
@@ -784,13 +808,18 @@ function createSettingsWindow(parentWindow) {
           <span id="update-badge" class="status-badge badge-info">v1.1.0</span>
         </div>
 
-        <div style="display:flex; gap:10px; align-items:center; width:100%;">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <button id="btn-check-updates" class="pill-btn pill-primary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-            Verificar Atualizações Agora
+            <svg id="btn-check-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            <span id="btn-check-label">Buscar Update</span>
           </button>
-          <button id="btn-install-update" class="pill-btn pill-primary" style="display: none; background: #2ba640; border-color: #2ba640;">
-            Reiniciar e Instalar Atualização
+          <button id="btn-install-update" class="pill-btn pill-green" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Instalar e Reiniciar
+          </button>
+          <button id="btn-download-manual" class="pill-btn pill-ghost" style="display:none;" title="Baixa a versão mais recente direto do GitHub">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            Baixar do GitHub
           </button>
         </div>
       </div>
@@ -1024,31 +1053,113 @@ function createSettingsWindow(parentWindow) {
     });
 
     // ── Gerenciador de Atualizações ──────────────────────────────────
-    const btnCheckUpdates = document.getElementById('btn-check-updates');
+    const btnCheckUpdates  = document.getElementById('btn-check-updates');
+    const btnCheckIcon     = document.getElementById('btn-check-icon');
+    const btnCheckLabel    = document.getElementById('btn-check-label');
     const btnInstallUpdate = document.getElementById('btn-install-update');
-    const updateDesc = document.getElementById('update-status-desc');
+    const btnDownloadManual = document.getElementById('btn-download-manual');
+    const updateDesc  = document.getElementById('update-status-desc');
     const updateBadge = document.getElementById('update-badge');
+    let pollTimer = null;
+
+    function setCheckingUI(on) {
+      btnCheckUpdates.disabled = on;
+      btnCheckUpdates.style.opacity = on ? '0.7' : '1';
+      if (on) {
+        // Troca icone por spinner
+        btnCheckIcon.style.display = 'none';
+        const spinner = document.createElement('span');
+        spinner.className = 'update-spinner';
+        spinner.id = 'update-spinner';
+        btnCheckUpdates.insertBefore(spinner, btnCheckLabel);
+        btnCheckLabel.textContent = 'Verificando...';
+      } else {
+        const spinner = document.getElementById('update-spinner');
+        if (spinner) spinner.remove();
+        btnCheckIcon.style.display = '';
+        btnCheckLabel.textContent = 'Buscar Update';
+      }
+    }
+
+    function applyStatus(info) {
+      if (!info) return;
+
+      const v = info.updateVersion || info.currentVersion || '';
+
+      if (info.status === 'checking') {
+        updateDesc.textContent = 'Procurando novidades...';
+        updateBadge.className = 'status-badge badge-info';
+        updateBadge.textContent = '...';
+        btnDownloadManual.style.display = 'none';
+      } else if (info.status === 'available' || info.status === 'downloading') {
+        const pct = info.progress > 0 ? ' — ' + info.progress + '%' : '';
+        updateDesc.textContent = 'Nova versão v' + v + ' encontrada! Baixando' + pct + '...';
+        updateBadge.className = 'status-badge badge-info';
+        updateBadge.textContent = 'Baixando' + (info.progress > 0 ? ' ' + info.progress + '%' : '...');
+        btnInstallUpdate.style.display = 'none';
+        btnDownloadManual.style.display = 'none';
+        // Continua polling
+        schedulePoll(1500);
+      } else if (info.status === 'downloaded') {
+        updateDesc.textContent = 'Versão v' + v + ' pronta! Clique para instalar e reiniciar.';
+        updateBadge.className = 'status-badge badge-success';
+        updateBadge.textContent = 'Pronto!';
+        btnInstallUpdate.style.display = 'inline-flex';
+        btnDownloadManual.style.display = 'none';
+        setCheckingUI(false);
+      } else if (info.status === 'not-available') {
+        updateDesc.textContent = 'Você já está na versão mais recente (v' + info.currentVersion + ').';
+        updateBadge.className = 'status-badge badge-success';
+        updateBadge.textContent = 'Atualizado';
+        btnInstallUpdate.style.display = 'none';
+        // Mostra botao de download manual caso queira reinstalar
+        btnDownloadManual.style.display = 'inline-flex';
+        setCheckingUI(false);
+      } else if (info.status === 'error') {
+        updateDesc.textContent = 'Falha ao verificar. Verifique sua conexão.';
+        updateBadge.className = 'status-badge badge-error';
+        updateBadge.textContent = 'Erro';
+        btnDownloadManual.style.display = 'inline-flex';
+        setCheckingUI(false);
+      } else if (info.status === 'dev-mode') {
+        updateDesc.textContent = 'Modo de desenvolvimento — atualização automática desabilitada.';
+        updateBadge.className = 'status-badge badge-info';
+        updateBadge.textContent = 'Dev';
+        setCheckingUI(false);
+      } else {
+        setCheckingUI(false);
+      }
+    }
+
+    function schedulePoll(delay) {
+      if (pollTimer) clearTimeout(pollTimer);
+      pollTimer = setTimeout(async () => {
+        try {
+          const info = await ipcRenderer.invoke('update:get-status');
+          applyStatus(info);
+        } catch (_) { setCheckingUI(false); }
+      }, delay || 1200);
+    }
 
     btnCheckUpdates.addEventListener('click', async () => {
-      btnCheckUpdates.disabled = true;
-      btnCheckUpdates.style.opacity = '0.6';
-      updateDesc.textContent = 'Verificando atualizações no GitHub...';
+      // Limpa estado anterior
+      btnInstallUpdate.style.display = 'none';
+      btnDownloadManual.style.display = 'none';
+      setCheckingUI(true);
+      updateDesc.textContent = 'Procurando novidades...';
+      updateBadge.className = 'status-badge badge-info';
+      updateBadge.textContent = '...';
 
       try {
         const res = await ipcRenderer.invoke('update:check');
         if (res && res.status === 'dev-mode') {
-          updateDesc.textContent = 'Ambiente de desenvolvimento (builds de teste não consultam releases).';
-          updateBadge.className = 'status-badge badge-info';
-          updateBadge.textContent = 'Modo Dev';
+          applyStatus({ status: 'dev-mode', currentVersion: res.version });
+        } else {
+          // Aguarda eventos async do autoUpdater via polling
+          schedulePoll(2000);
         }
       } catch (err) {
-        updateDesc.textContent = 'Erro ao verificar: ' + err.message;
-        updateBadge.className = 'status-badge badge-error';
-        updateBadge.textContent = 'Falha';
-      } finally {
-        btnCheckUpdates.disabled = false;
-        btnCheckUpdates.style.opacity = '1';
-        setTimeout(pollUpdateStatus, 1000);
+        applyStatus({ status: 'error' });
       }
     });
 
@@ -1056,32 +1167,16 @@ function createSettingsWindow(parentWindow) {
       ipcRenderer.invoke('update:install-now');
     });
 
+    // Botao de download direto do GitHub Releases (fallback / mesma versao)
+    btnDownloadManual.addEventListener('click', () => {
+      shell.openExternal('https://github.com/AllvesMatteus/youtube-music/releases/latest');
+    });
+
     async function pollUpdateStatus() {
       try {
         const info = await ipcRenderer.invoke('update:get-status');
-        if (info) {
-          if (info.status === 'checking') {
-            updateDesc.textContent = 'Verificando novidades no repositório...';
-          } else if (info.status === 'available') {
-            updateDesc.textContent = 'Nova versão v' + (info.updateVersion || '') + ' disponível! Baixando...';
-            updateBadge.className = 'status-badge badge-info';
-            updateBadge.textContent = 'Baixando...';
-          } else if (info.status === 'downloaded') {
-            updateDesc.textContent = 'Versão v' + (info.updateVersion || '') + ' pronta para instalação!';
-            updateBadge.className = 'status-badge badge-success';
-            updateBadge.textContent = 'Pronto!';
-            btnInstallUpdate.style.display = 'inline-flex';
-          } else if (info.status === 'not-available') {
-            updateDesc.textContent = 'Você já está utilizando a versão mais recente (v' + info.currentVersion + ').';
-            updateBadge.className = 'status-badge badge-success';
-            updateBadge.textContent = 'Atualizado';
-          } else if (info.status === 'error') {
-            updateDesc.textContent = 'Não foi possível verificar: ' + (info.errorMessage || 'Sem conexão.');
-            updateBadge.className = 'status-badge badge-error';
-            updateBadge.textContent = 'Erro';
-          }
-        }
-      } catch (err) {}
+        applyStatus(info);
+      } catch (_) {}
     }
 
     loadSettings();
