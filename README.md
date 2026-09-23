@@ -1,4 +1,4 @@
-﻿# 🎵 YouTube Music Desktop
+# 🎵 YouTube Music Desktop
 
 [![Version](https://img.shields.io/badge/version-1.1.0-red.svg?style=flat-square)](https://github.com/AllvesMatteus/youtube-music/releases)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-blue.svg?style=flat-square)](https://www.microsoft.com/windows)
