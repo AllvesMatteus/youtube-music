@@ -12,7 +12,8 @@
     "dev": "electron .",
     "build": "electron-builder --win",
     "build:dev": "electron-builder --win --dir",
-    "release": "electron-builder --win --publish always"
+    "release": "electron-builder --win --publish always",
+    "publish:auto": "powershell -ExecutionPolicy Bypass -File ./scripts/publish.ps1"
   },
   "build": {
     "appId": "com.allvesmatteus.ytmusic",
